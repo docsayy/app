@@ -518,9 +518,8 @@
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
     import {
       getAuth,
-      GoogleAuthProvider,
-      onAuthStateChanged,
-      signInWithPopup,
+      createUserWithEmailAndPassword,
+      signInWithEmailAndPassword,
       signOut
     } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
     import {
@@ -539,8 +538,6 @@
       messagingSenderId: '1093457578265',
       appId: '1:1093457578265:web:f4a65515ce8d671a1f1d88'
     };
-    
-    
 
     const hasFirebaseConfig = Object.values(firebaseConfig).every(
       (value) => value && !String(value).includes('PASTE_YOUR')
@@ -621,16 +618,21 @@
     document.getElementById('cancelStoreBtn').addEventListener('click', closeStoreModal);
 
     signInBtn.addEventListener('click', async () => {
-      if (!hasFirebaseConfig) {
-        alert('Add your Firebase config first inside the code, then sign-in will work.');
-        return;
-      }
+      if (!auth) return;
+
+      const email = prompt('Enter email', 'msayan92@gmail.com');
+      const password = prompt('Enter password (create one if first time)');
+
+      if (!email || !password) return;
 
       try {
-        await signInWithPopup(auth, provider);
-      } catch (error) {
-        console.error(error);
-        alert('Google sign-in failed. Check your Firebase Auth setup and authorized domain.');
+        await signInWithEmailAndPassword(auth, email, password);
+      } catch (err) {
+        try {
+          await createUserWithEmailAndPassword(auth, email, password);
+        } catch (e) {
+          alert('Login failed: ' + e.message);
+        }
       }
     });
 
