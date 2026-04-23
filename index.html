@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Grocery App</title>
+  <style>
+    :root {
+      --bg: #eef5f8;
+      --card: #ffffff;
+      --text: #12324a;
+      --muted: #6d7d8a;
+      --line: #d7e2e8;
+      --blue: #2e7db2;
+      --blue-dark: #1f5f89;
+      --green: #2db36c;
+      --green-dark: #1f9155;
+      --orange: #f39a35;
+      --shadow: 0 10px 30px rgba(18, 50, 74, 0.08);
+      --danger: #d84c4c;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #dfeef5 0%, var(--bg) 100%);
+      color: var(--text);
+    }
+
+    .app {
+      max-width: 520px;
+      margin: 0 auto;
+      min-height: 100vh;
+      padding-bottom: 110px;
+    }
+
+    .topbar {
+      position: sticky;
+      top: 0;
+      z-index: 20;
+      background: rgba(223, 238, 245, 0.95);
+      backdrop-filter: blur(8px);
+      padding: 12px 12px 8px;
+      border-bottom: 1px solid rgba(215, 226, 232, 0.9);
+    }
+
+    .store-tabs {
+      display: flex;
+      gap: 10px;
+      overflow-x: auto;
+      padding-bottom: 4px;
+      scrollbar-width: none;
+    }
+
+    .store-tabs::-webkit-scrollbar { display: none; }
+
+    .store-tab,
+    .add-store-btn,
+    .action-btn,
+    .save-btn,
+    .cancel-btn,
+    .icon-btn,
+    .fab,
+    .auth-btn,
+    .secondary-btn {
+      border: none;
+      cursor: pointer;
+      font: inherit;
+    }
+
+    .store-tab {
+      min-width: max-content;
+      padding: 14px 18px;
+      border-radius: 18px 18px 10px 10px;
+      background: #7eb3d1;
+      color: white;
+      font-weight: 700;
+      font-size: 1rem;
+      box-shadow: var(--shadow);
+    }
+
+    .store-tab.active {
+      background: linear-gradient(180deg, var(--blue) 0%, var(--blue-dark) 100%);
+    }
+
+    .add-store-btn {
+      min-width: 54px;
+      border-radius: 18px;
+      background: #4bc36f;
+      color: white;
+      font-size: 1.7rem;
+      line-height: 1;
+      padding: 10px 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .content {
+      padding: 16px 12px 24px;
+    }
+
+    .panel {
+      background: var(--card);
+      border-radius: 28px;
+      padding: 18px 16px 20px;
+      box-shadow: var(--shadow);
+      border: 1px solid rgba(215, 226, 232, 0.7);
+    }
+
+    .section-title {
+      text-align: center;
+      font-size: 1.15rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      margin: 8px 0 16px;
+      color: var(--blue-dark);
+    }
+
+    .section-title.saved-title {
+      text-align: left;
+      margin-bottom: 0;
+      font-size: 1rem;
+      letter-spacing: 0.04em;
+    }
+
+    .item-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .item-row {
+      display: grid;
+      grid-template-columns: 52px 1fr auto;
+      gap: 12px;
+      align-items: center;
+      padding: 10px 4px;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .item-row:last-child {
+      border-bottom: none;
+    }
+
+    .check-btn {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      border: 3px solid var(--blue);
+      background: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: white;
+      cursor: pointer;
+    }
+
+    .check-btn.done {
+      background: var(--green);
+      border-color: var(--green-dark);
+      color: white;
+    }
+
+    .item-main {
+      min-width: 0;
+    }
+
+    .item-name {
+      font-size: 1.9rem;
+      font-weight: 800;
+      line-height: 1.05;
+      word-break: break-word;
+    }
+
+    .item-meta {
+      margin-top: 4px;
+      font-size: 1rem;
+      color: var(--muted);
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .item-qty {
+      font-weight: 700;
+      color: var(--blue-dark);
+    }
+
+    .item-price {
+      font-weight: 800;
+      color: #c77a17;
+    }
+
+    .edit-area {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      align-items: flex-end;
+    }
+
+    .icon-btn {
+      background: #edf4f8;
+      color: var(--blue-dark);
+      border-radius: 12px;
+      width: 40px;
+      height: 40px;
+      font-size: 1.05rem;
+      border: 1px solid var(--line);
+    }
+
+    .icon-btn.delete {
+      color: var(--danger);
+    }
+
+    .divider-space {
+      height: 8px;
+    }
+
+    .saved-section {
+      margin-top: 12px;
+      border-top: 1px solid var(--line);
+      padding-top: 6px;
+    }
+
+    .saved-header {
+      width: 100%;
+      background: transparent;
+      border: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px 0;
+      cursor: pointer;
+      color: var(--blue-dark);
+      font: inherit;
+      font-weight: 800;
+    }
+
+    .saved-count {
+      color: var(--muted);
+      font-size: 0.95rem;
+      font-weight: 700;
+    }
+
+    .empty-state {
+      color: var(--muted);
+      text-align: center;
+      padding: 10px 8px 16px;
+      font-size: 0.98rem;
+    }
+
+    .bottom-bar {
+      position: fixed;
+      left: 50%;
+      transform: translateX(-50%);
+      bottom: 0;
+      width: 100%;
+      max-width: 520px;
+      background: rgba(255, 255, 255, 0.96);
+      backdrop-filter: blur(10px);
+      border-top: 1px solid var(--line);
+      padding: 12px 14px 18px;
+      box-shadow: 0 -8px 24px rgba(18, 50, 74, 0.08);
+      z-index: 25;
+    }
+
+    .bottom-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .total-label {
+      color: #8e1357;
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+
+    .total-value {
+      color: #8e1357;
+      font-size: 2rem;
+      font-weight: 900;
+      line-height: 1;
+      margin-top: 2px;
+    }
+
+    .fab {
+      background: linear-gradient(180deg, var(--green) 0%, var(--green-dark) 100%);
+      color: white;
+      border-radius: 18px;
+      padding: 14px 18px;
+      font-weight: 800;
+      box-shadow: var(--shadow);
+      white-space: nowrap;
+    }
+
+    .auth-bar {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 12px;
+      background: rgba(255,255,255,0.7);
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 10px 12px;
+    }
+
+    .auth-text {
+      font-size: 0.92rem;
+      color: var(--muted);
+    }
+
+    .auth-btn,
+    .secondary-btn,
+    .save-btn,
+    .cancel-btn,
+    .action-btn {
+      border-radius: 12px;
+      padding: 11px 14px;
+      font-weight: 700;
+    }
+
+    .auth-btn,
+    .save-btn,
+    .action-btn {
+      background: var(--blue);
+      color: white;
+    }
+
+    .secondary-btn,
+    .cancel-btn {
+      background: #eef4f8;
+      color: var(--blue-dark);
+      border: 1px solid var(--line);
+    }
+
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(13, 33, 48, 0.42);
+      display: none;
+      align-items: flex-end;
+      justify-content: center;
+      z-index: 40;
+      padding: 0;
+    }
+
+    .modal-backdrop.show {
+      display: flex;
+    }
+
+    .modal {
+      width: 100%;
+      max-width: 520px;
+      background: white;
+      border-radius: 24px 24px 0 0;
+      padding: 18px 16px 20px;
+      box-shadow: 0 -16px 40px rgba(13, 33, 48, 0.2);
+    }
+
+    .modal h3 {
+      margin: 4px 0 16px;
+      font-size: 1.25rem;
+      color: var(--blue-dark);
+    }
+
+    .form-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.92rem;
+      color: var(--muted);
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    input,
+    select {
+      width: 100%;
+      border: 2px solid #c8d8e2;
+      border-radius: 14px;
+      padding: 14px 14px;
+      font-size: 1rem;
+      outline: none;
+      background: white;
+    }
+
+    input:focus,
+    select:focus {
+      border-color: var(--blue);
+      box-shadow: 0 0 0 3px rgba(46, 125, 178, 0.12);
+    }
+
+    .modal-actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    .modal-actions > * {
+      flex: 1;
+    }
+
+    @media (max-width: 420px) {
+      .item-name { font-size: 1.55rem; }
+      .store-tab { padding: 12px 16px; }
+      .total-value { font-size: 1.7rem; }
+      .fab { padding: 12px 14px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <div class="topbar">
+      <div class="store-tabs" id="storeTabs"></div>
+    </div>
+
+    <div class="content">
+      <div class="auth-bar">
+        <div class="auth-text" id="authText">Using local storage for now</div>
+        <button class="auth-btn" id="signInBtn">Sign in later</button>
+      </div>
+
+      <div class="panel">
+        <div class="section-title">HAVE TO GET</div>
+        <div class="item-list" id="todoList"></div>
+
+        <div class="section-title">GOT</div>
+        <div class="item-list" id="doneList"></div>
+
+        <div class="saved-section">
+          <button class="saved-header" id="savedToggleBtn">
+            <span class="section-title saved-title">SAVED</span>
+            <span class="saved-count" id="savedCountLabel">0 items</span>
+          </button>
+          <div class="item-list" id="savedList" hidden></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-bar">
+    <div class="bottom-inner">
+      <div>
+        <div class="total-label">PICKED TOTAL</div>
+        <div class="total-value" id="pickedTotal">$0.00</div>
+      </div>
+      <button class="fab" id="addItemBtn">+ Add Item</button>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="itemModalBackdrop">
+    <div class="modal">
+      <h3 id="modalTitle">Add Item</h3>
+      <form id="itemForm">
+        <div class="form-grid">
+          <div>
+            <label for="itemName">Item name</label>
+            <input id="itemName" type="text" placeholder="Eggs" required />
+          </div>
+          <div>
+            <label for="itemQty">Quantity</label>
+            <input id="itemQty" type="text" placeholder="2" />
+          </div>
+          <div>
+            <label for="itemPrice">Price</label>
+            <input id="itemPrice" type="number" min="0" step="0.01" placeholder="14.50" />
+          </div>
+          <div>
+            <label for="itemStatus">Place item in</label>
+            <select id="itemStatus">
+              <option value="todo">Have to Get</option>
+              <option value="saved">Saved</option>
+              <option value="done">Got</option>
+            </select>
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="cancel-btn" id="cancelItemBtn">Cancel</button>
+          <button type="submit" class="save-btn">Save</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="modal-backdrop" id="storeModalBackdrop">
+    <div class="modal">
+      <h3>Add Store</h3>
+      <form id="storeForm">
+        <div class="form-grid">
+          <div>
+            <label for="storeName">Store name</label>
+            <input id="storeName" type="text" placeholder="Costco" required />
+          </div>
+        </div>
+        <div class="modal-actions">
+          <button type="button" class="cancel-btn" id="cancelStoreBtn">Cancel</button>
+          <button type="submit" class="save-btn">Save Store</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const STORAGE_KEY = 'grocery-app-v1';
+
+    const defaultData = {
+      currentStoreId: 'store-1',
+      savedExpanded: false,
+      stores: [
+        {
+          id: 'store-1',
+          name: 'Costco',
+          items: [
+            { id: crypto.randomUUID(), name: 'Eggs', qty: '2', price: 14.5, status: 'todo' },
+            { id: crypto.randomUUID(), name: 'Milk', qty: '3', price: 8.5, status: 'todo' },
+            { id: crypto.randomUUID(), name: 'Banana', qty: '1', price: 2, status: 'todo' },
+            { id: crypto.randomUUID(), name: 'Pringles', qty: '1', price: 3, status: 'done' },
+            { id: crypto.randomUUID(), name: 'Rice', qty: '1 bag', price: 18.99, status: 'saved' }
+          ]
+        },
+        {
+          id: 'store-2',
+          name: 'ShopRite',
+          items: []
+        },
+        {
+          id: 'store-3',
+          name: 'Patel',
+          items: []
+        }
+      ]
+    };
+
+    let state = loadState();
+    let editingItemId = null;
+
+    const storeTabs = document.getElementById('storeTabs');
+    const todoList = document.getElementById('todoList');
+    const doneList = document.getElementById('doneList');
+    const savedList = document.getElementById('savedList');
+    const savedToggleBtn = document.getElementById('savedToggleBtn');
+    const savedCountLabel = document.getElementById('savedCountLabel');
+    const pickedTotal = document.getElementById('pickedTotal');
+
+    const itemModalBackdrop = document.getElementById('itemModalBackdrop');
+    const itemForm = document.getElementById('itemForm');
+    const modalTitle = document.getElementById('modalTitle');
+    const itemName = document.getElementById('itemName');
+    const itemQty = document.getElementById('itemQty');
+    const itemPrice = document.getElementById('itemPrice');
+    const itemStatus = document.getElementById('itemStatus');
+
+    const storeModalBackdrop = document.getElementById('storeModalBackdrop');
+    const storeForm = document.getElementById('storeForm');
+    const storeName = document.getElementById('storeName');
+
+    document.getElementById('addItemBtn').addEventListener('click', openAddItemModal);
+    document.getElementById('cancelItemBtn').addEventListener('click', closeItemModal);
+    document.getElementById('cancelStoreBtn').addEventListener('click', closeStoreModal);
+    document.getElementById('signInBtn').addEventListener('click', () => {
+      alert('We can wire up Firebase Auth next. For now this version saves locally in your browser.');
+    });
+
+    savedToggleBtn.addEventListener('click', () => {
+      state.savedExpanded = !state.savedExpanded;
+      persist();
+      render();
+    });
+
+    itemModalBackdrop.addEventListener('click', (e) => {
+      if (e.target === itemModalBackdrop) closeItemModal();
+    });
+
+    storeModalBackdrop.addEventListener('click', (e) => {
+      if (e.target === storeModalBackdrop) closeStoreModal();
+    });
+
+    itemForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const store = getCurrentStore();
+      const payload = {
+        name: itemName.value.trim(),
+        qty: itemQty.value.trim(),
+        price: itemPrice.value === '' ? 0 : Number(itemPrice.value),
+        status: itemStatus.value
+      };
+
+      if (!payload.name) return;
+
+      if (editingItemId) {
+        const item = store.items.find((entry) => entry.id === editingItemId);
+        if (item) Object.assign(item, payload);
+      } else {
+        store.items.unshift({ id: crypto.randomUUID(), ...payload });
+      }
+
+      persist();
+      render();
+      closeItemModal();
+    });
+
+    storeForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const name = storeName.value.trim();
+      if (!name) return;
+
+      const newStore = {
+        id: crypto.randomUUID(),
+        name,
+        items: []
+      };
+
+      state.stores.push(newStore);
+      state.currentStoreId = newStore.id;
+      persist();
+      render();
+      closeStoreModal();
+    });
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return structuredClone(defaultData);
+        const parsed = JSON.parse(raw);
+        if (!parsed.stores?.length) return structuredClone(defaultData);
+        return parsed;
+      } catch {
+        return structuredClone(defaultData);
+      }
+    }
+
+    function persist() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function getCurrentStore() {
+      return state.stores.find((store) => store.id === state.currentStoreId) || state.stores[0];
+    }
+
+    function formatMoney(value) {
+      return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+      }).format(Number(value || 0));
+    }
+
+    function render() {
+      renderStoreTabs();
+
+      const currentStore = getCurrentStore();
+      state.currentStoreId = currentStore.id;
+
+      const todoItems = currentStore.items.filter((item) => item.status === 'todo');
+      const doneItems = currentStore.items.filter((item) => item.status === 'done');
+      const savedItems = currentStore.items.filter((item) => item.status === 'saved');
+
+      renderList(todoList, todoItems, 'todo');
+      renderList(doneList, doneItems, 'done');
+      renderList(savedList, savedItems, 'saved');
+
+      savedList.hidden = !state.savedExpanded;
+      savedCountLabel.textContent = `${savedItems.length} item${savedItems.length === 1 ? '' : 's'} ${state.savedExpanded ? '▲' : '▼'}`;
+      pickedTotal.textContent = formatMoney(doneItems.reduce((sum, item) => sum + Number(item.price || 0), 0));
+
+      persist();
+    }
+
+    function renderStoreTabs() {
+      storeTabs.innerHTML = '';
+
+      state.stores.forEach((store) => {
+        const btn = document.createElement('button');
+        btn.className = `store-tab ${store.id === state.currentStoreId ? 'active' : ''}`;
+        btn.textContent = store.name;
+        btn.addEventListener('click', () => {
+          state.currentStoreId = store.id;
+          persist();
+          render();
+        });
+        storeTabs.appendChild(btn);
+      });
+
+      const addBtn = document.createElement('button');
+      addBtn.className = 'add-store-btn';
+      addBtn.textContent = '+';
+      addBtn.title = 'Add store';
+      addBtn.addEventListener('click', openStoreModal);
+      storeTabs.appendChild(addBtn);
+    }
+
+    function renderList(container, items, listType) {
+      container.innerHTML = '';
+
+      if (!items.length) {
+        const empty = document.createElement('div');
+        empty.className = 'empty-state';
+        empty.textContent = listType === 'saved'
+          ? 'No saved items here yet.'
+          : listType === 'done'
+            ? 'Nothing picked up yet.'
+            : 'Nothing on this list right now.';
+        container.appendChild(empty);
+        return;
+      }
+
+      items.forEach((item) => {
+        const row = document.createElement('div');
+        row.className = 'item-row';
+
+        const checkBtn = document.createElement('button');
+        checkBtn.className = `check-btn ${item.status === 'done' ? 'done' : ''}`;
+        checkBtn.innerHTML = item.status === 'done' ? '✓' : '';
+        checkBtn.title = item.status === 'done' ? 'Move back to Have to Get' : 'Mark as Got';
+        checkBtn.addEventListener('click', () => toggleDone(item.id));
+
+        const main = document.createElement('div');
+        main.className = 'item-main';
+
+        const name = document.createElement('div');
+        name.className = 'item-name';
+        name.textContent = item.name;
+
+        const meta = document.createElement('div');
+        meta.className = 'item-meta';
+        meta.innerHTML = `
+          <span class="item-qty">${item.qty ? `Qty: ${escapeHtml(item.qty)}` : 'Qty: —'}</span>
+          <span>•</span>
+          <span class="item-price">${formatMoney(item.price)}</span>
+        `;
+
+        main.appendChild(name);
+        main.appendChild(meta);
+
+        const editArea = document.createElement('div');
+        editArea.className = 'edit-area';
+
+        const editBtn = document.createElement('button');
+        editBtn.className = 'icon-btn';
+        editBtn.textContent = '✏️';
+        editBtn.title = 'Edit item';
+        editBtn.addEventListener('click', () => openEditItemModal(item.id));
+
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'icon-btn delete';
+        deleteBtn.textContent = '🗑';
+        deleteBtn.title = 'Delete item';
+        deleteBtn.addEventListener('click', () => deleteItem(item.id));
+
+        editArea.appendChild(editBtn);
+        editArea.appendChild(deleteBtn);
+
+        row.appendChild(checkBtn);
+        row.appendChild(main);
+        row.appendChild(editArea);
+        container.appendChild(row);
+      });
+    }
+
+    function toggleDone(itemId) {
+      const store = getCurrentStore();
+      const item = store.items.find((entry) => entry.id === itemId);
+      if (!item) return;
+
+      if (item.status === 'done') {
+        item.status = 'todo';
+      } else {
+        item.status = 'done';
+      }
+
+      persist();
+      render();
+    }
+
+    function deleteItem(itemId) {
+      const store = getCurrentStore();
+      store.items = store.items.filter((item) => item.id !== itemId);
+      persist();
+      render();
+    }
+
+    function openAddItemModal() {
+      editingItemId = null;
+      modalTitle.textContent = 'Add Item';
+      itemForm.reset();
+      itemStatus.value = 'todo';
+      itemModalBackdrop.classList.add('show');
+      setTimeout(() => itemName.focus(), 0);
+    }
+
+    function openEditItemModal(itemId) {
+      const store = getCurrentStore();
+      const item = store.items.find((entry) => entry.id === itemId);
+      if (!item) return;
+
+      editingItemId = item.id;
+      modalTitle.textContent = 'Edit Item';
+      itemName.value = item.name;
+      itemQty.value = item.qty || '';
+      itemPrice.value = item.price || 0;
+      itemStatus.value = item.status;
+      itemModalBackdrop.classList.add('show');
+      setTimeout(() => itemName.focus(), 0);
+    }
+
+    function closeItemModal() {
+      itemModalBackdrop.classList.remove('show');
+      itemForm.reset();
+      editingItemId = null;
+    }
+
+    function openStoreModal() {
+      storeForm.reset();
+      storeModalBackdrop.classList.add('show');
+      setTimeout(() => storeName.focus(), 0);
+    }
+
+    function closeStoreModal() {
+      storeModalBackdrop.classList.remove('show');
+      storeForm.reset();
+    }
+
+    function escapeHtml(value) {
+      const div = document.createElement('div');
+      div.textContent = value;
+      return div.innerHTML;
+    }
+
+    render();
+  </script>
+</body>
+</html>
