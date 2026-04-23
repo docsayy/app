@@ -427,8 +427,11 @@
 
     <div class="content">
       <div class="auth-bar">
-        <div class="auth-text" id="authText">Using local storage for now</div>
-        <button class="auth-btn" id="signInBtn">Sign in later</button>
+        <div class="auth-text" id="authText">Checking sign-in...</div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
+          <button class="auth-btn" id="signInBtn">Sign in with Google</button>
+          <button class="secondary-btn" id="signOutBtn" hidden>Sign out</button>
+        </div>
       </div>
 
       <div class="panel">
@@ -511,8 +514,39 @@
     </div>
   </div>
 
-  <script>
-    const STORAGE_KEY = 'grocery-app-v1';
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js';
+    import {
+      getAuth,
+      GoogleAuthProvider,
+      onAuthStateChanged,
+      signInWithPopup,
+      signOut
+    } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js';
+    import {
+      getFirestore,
+      doc,
+      getDoc,
+      setDoc,
+      serverTimestamp
+    } from 'https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js';
+
+    const firebaseConfig = {
+      apiKey: 'AIzaSyCKjRp3Cznv-kpLmV_jTMWPLbxholG8_t0',
+      authDomain: 'grocery-tracker-ac17b.firebaseapp.com',
+      projectId: 'grocery-tracker-ac17b',
+      storageBucket: 'grocery-tracker-ac17b.firebasestorage.app',
+      messagingSenderId: '1093457578265',
+      appId: '1:1093457578265:web:f4a65515ce8d671a1f1d88'
+    };
+    
+    
+
+    const hasFirebaseConfig = Object.values(firebaseConfig).every(
+      (value) => value && !String(value).includes('PASTE_YOUR')
+    );
+
+    const localStorageKey = 'grocery-app-v1';
 
     const defaultData = {
       currentStoreId: 'store-1',
@@ -542,8 +576,21 @@
       ]
     };
 
-    let state = loadState();
+    let app = null;
+    let auth = null;
+    let db = null;
+    let provider = null;
+    let currentUser = null;
+    let isSyncing = false;
     let editingItemId = null;
+    let state = loadLocalState();
+
+    if (hasFirebaseConfig) {
+      app = initializeApp(firebaseConfig);
+      auth = getAuth(app);
+      db = getFirestore(app);
+      provider = new GoogleAuthProvider();
+    }
 
     const storeTabs = document.getElementById('storeTabs');
     const todoList = document.getElementById('todoList');
@@ -565,16 +612,36 @@
     const storeForm = document.getElementById('storeForm');
     const storeName = document.getElementById('storeName');
 
+    const authText = document.getElementById('authText');
+    const signInBtn = document.getElementById('signInBtn');
+    const signOutBtn = document.getElementById('signOutBtn');
+
     document.getElementById('addItemBtn').addEventListener('click', openAddItemModal);
     document.getElementById('cancelItemBtn').addEventListener('click', closeItemModal);
     document.getElementById('cancelStoreBtn').addEventListener('click', closeStoreModal);
-    document.getElementById('signInBtn').addEventListener('click', () => {
-      alert('We can wire up Firebase Auth next. For now this version saves locally in your browser.');
+
+    signInBtn.addEventListener('click', async () => {
+      if (!hasFirebaseConfig) {
+        alert('Add your Firebase config first inside the code, then sign-in will work.');
+        return;
+      }
+
+      try {
+        await signInWithPopup(auth, provider);
+      } catch (error) {
+        console.error(error);
+        alert('Google sign-in failed. Check your Firebase Auth setup and authorized domain.');
+      }
     });
 
-    savedToggleBtn.addEventListener('click', () => {
+    signOutBtn.addEventListener('click', async () => {
+      if (!auth) return;
+      await signOut(auth);
+    });
+
+    savedToggleBtn.addEventListener('click', async () => {
       state.savedExpanded = !state.savedExpanded;
-      persist();
+      await persistState();
       render();
     });
 
@@ -586,7 +653,7 @@
       if (e.target === storeModalBackdrop) closeStoreModal();
     });
 
-    itemForm.addEventListener('submit', (e) => {
+    itemForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const store = getCurrentStore();
       const payload = {
@@ -605,12 +672,12 @@
         store.items.unshift({ id: crypto.randomUUID(), ...payload });
       }
 
-      persist();
+      await persistState();
       render();
       closeItemModal();
     });
 
-    storeForm.addEventListener('submit', (e) => {
+    storeForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       const name = storeName.value.trim();
       if (!name) return;
@@ -623,25 +690,96 @@
 
       state.stores.push(newStore);
       state.currentStoreId = newStore.id;
-      persist();
+      await persistState();
       render();
       closeStoreModal();
     });
 
-    function loadState() {
+    function loadLocalState() {
       try {
-        const raw = localStorage.getItem(STORAGE_KEY);
+        const raw = localStorage.getItem(localStorageKey);
         if (!raw) return structuredClone(defaultData);
         const parsed = JSON.parse(raw);
-        if (!parsed.stores?.length) return structuredClone(defaultData);
-        return parsed;
+        return normalizeState(parsed);
       } catch {
         return structuredClone(defaultData);
       }
     }
 
-    function persist() {
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    function normalizeState(input) {
+      if (!input || !Array.isArray(input.stores) || !input.stores.length) {
+        return structuredClone(defaultData);
+      }
+
+      const normalized = {
+        currentStoreId: input.currentStoreId || input.stores[0]?.id || 'store-1',
+        savedExpanded: Boolean(input.savedExpanded),
+        stores: input.stores.map((store, index) => ({
+          id: store.id || `store-${index + 1}`,
+          name: store.name || `Store ${index + 1}`,
+          items: Array.isArray(store.items)
+            ? store.items.map((item) => ({
+                id: item.id || crypto.randomUUID(),
+                name: item.name || '',
+                qty: item.qty || '',
+                price: Number(item.price || 0),
+                status: ['todo', 'done', 'saved'].includes(item.status) ? item.status : 'todo'
+              }))
+            : []
+        }))
+      };
+
+      if (!normalized.stores.find((store) => store.id === normalized.currentStoreId)) {
+        normalized.currentStoreId = normalized.stores[0].id;
+      }
+
+      return normalized;
+    }
+
+    async function persistState() {
+      localStorage.setItem(localStorageKey, JSON.stringify(state));
+
+      if (!currentUser || !db || isSyncing) return;
+
+      try {
+        await setDoc(
+          doc(db, 'users', currentUser.uid, 'appData', 'groceryState'),
+          {
+            ...state,
+            updatedAt: serverTimestamp()
+          },
+          { merge: true }
+        );
+      } catch (error) {
+        console.error('Firestore save failed:', error);
+      }
+    }
+
+    async function loadCloudState(user) {
+      if (!db) return;
+
+      isSyncing = true;
+      try {
+        const ref = doc(db, 'users', user.uid, 'appData', 'groceryState');
+        const snap = await getDoc(ref);
+
+        if (snap.exists()) {
+          const data = snap.data();
+          state = normalizeState(data);
+          localStorage.setItem(localStorageKey, JSON.stringify(state));
+        } else {
+          await setDoc(ref, {
+            ...state,
+            updatedAt: serverTimestamp()
+          });
+        }
+      } catch (error) {
+        console.error('Firestore load failed:', error);
+        alert('Could not load cloud data. Using local data for now.');
+      } finally {
+        isSyncing = false;
+        render();
+      }
     }
 
     function getCurrentStore() {
@@ -672,8 +810,28 @@
       savedList.hidden = !state.savedExpanded;
       savedCountLabel.textContent = `${savedItems.length} item${savedItems.length === 1 ? '' : 's'} ${state.savedExpanded ? '▲' : '▼'}`;
       pickedTotal.textContent = formatMoney(doneItems.reduce((sum, item) => sum + Number(item.price || 0), 0));
+      updateAuthUi();
+    }
 
-      persist();
+    function updateAuthUi() {
+      if (!hasFirebaseConfig) {
+        authText.textContent = 'Add Firebase config to enable sign-in and sync';
+        signInBtn.hidden = false;
+        signInBtn.textContent = 'Setup Firebase First';
+        signOutBtn.hidden = true;
+        return;
+      }
+
+      if (currentUser) {
+        authText.textContent = `Signed in as ${currentUser.displayName || currentUser.email || 'User'}`;
+        signInBtn.hidden = true;
+        signOutBtn.hidden = false;
+      } else {
+        authText.textContent = 'Sign in with Google to sync your list across devices';
+        signInBtn.hidden = false;
+        signInBtn.textContent = 'Sign in with Google';
+        signOutBtn.hidden = true;
+      }
     }
 
     function renderStoreTabs() {
@@ -683,9 +841,9 @@
         const btn = document.createElement('button');
         btn.className = `store-tab ${store.id === state.currentStoreId ? 'active' : ''}`;
         btn.textContent = store.name;
-        btn.addEventListener('click', () => {
+        btn.addEventListener('click', async () => {
           state.currentStoreId = store.id;
-          persist();
+          await persistState();
           render();
         });
         storeTabs.appendChild(btn);
@@ -722,7 +880,9 @@
         checkBtn.className = `check-btn ${item.status === 'done' ? 'done' : ''}`;
         checkBtn.innerHTML = item.status === 'done' ? '✓' : '';
         checkBtn.title = item.status === 'done' ? 'Move back to Have to Get' : 'Mark as Got';
-        checkBtn.addEventListener('click', () => toggleDone(item.id));
+        checkBtn.addEventListener('click', async () => {
+          await toggleDone(item.id);
+        });
 
         const main = document.createElement('div');
         main.className = 'item-main';
@@ -733,11 +893,21 @@
 
         const meta = document.createElement('div');
         meta.className = 'item-meta';
-        meta.innerHTML = `
-          <span class="item-qty">${item.qty ? `Qty: ${escapeHtml(item.qty)}` : 'Qty: —'}</span>
-          <span>•</span>
-          <span class="item-price">${formatMoney(item.price)}</span>
-        `;
+
+        const qtySpan = document.createElement('span');
+        qtySpan.className = 'item-qty';
+        qtySpan.textContent = item.qty ? `Qty: ${item.qty}` : 'Qty: —';
+
+        const dotSpan = document.createElement('span');
+        dotSpan.textContent = '•';
+
+        const priceSpan = document.createElement('span');
+        priceSpan.className = 'item-price';
+        priceSpan.textContent = formatMoney(item.price);
+
+        meta.appendChild(qtySpan);
+        meta.appendChild(dotSpan);
+        meta.appendChild(priceSpan);
 
         main.appendChild(name);
         main.appendChild(meta);
@@ -755,7 +925,9 @@
         deleteBtn.className = 'icon-btn delete';
         deleteBtn.textContent = '🗑';
         deleteBtn.title = 'Delete item';
-        deleteBtn.addEventListener('click', () => deleteItem(item.id));
+        deleteBtn.addEventListener('click', async () => {
+          await deleteItem(item.id);
+        });
 
         editArea.appendChild(editBtn);
         editArea.appendChild(deleteBtn);
@@ -767,25 +939,20 @@
       });
     }
 
-    function toggleDone(itemId) {
+    async function toggleDone(itemId) {
       const store = getCurrentStore();
       const item = store.items.find((entry) => entry.id === itemId);
       if (!item) return;
 
-      if (item.status === 'done') {
-        item.status = 'todo';
-      } else {
-        item.status = 'done';
-      }
-
-      persist();
+      item.status = item.status === 'done' ? 'todo' : 'done';
+      await persistState();
       render();
     }
 
-    function deleteItem(itemId) {
+    async function deleteItem(itemId) {
       const store = getCurrentStore();
       store.items = store.items.filter((item) => item.id !== itemId);
-      persist();
+      await persistState();
       render();
     }
 
@@ -830,10 +997,15 @@
       storeForm.reset();
     }
 
-    function escapeHtml(value) {
-      const div = document.createElement('div');
-      div.textContent = value;
-      return div.innerHTML;
+    if (hasFirebaseConfig) {
+      onAuthStateChanged(auth, async (user) => {
+        currentUser = user || null;
+        render();
+
+        if (currentUser) {
+          await loadCloudState(currentUser);
+        }
+      });
     }
 
     render();
