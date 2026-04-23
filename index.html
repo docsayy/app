@@ -429,7 +429,7 @@
       <div class="auth-bar">
         <div class="auth-text" id="authText">Checking sign-in...</div>
         <div style="display:flex; gap:10px; flex-wrap:wrap; justify-content:flex-end;">
-          <button class="auth-btn" id="signInBtn">Sign in with Google</button>
+          <button class="auth-btn" id="signInBtn">Sign in (Email)</button>
           <button class="secondary-btn" id="signOutBtn" hidden>Sign out</button>
         </div>
       </div>
@@ -586,7 +586,7 @@
       app = initializeApp(firebaseConfig);
       auth = getAuth(app);
       db = getFirestore(app);
-      provider = new GoogleAuthProvider();
+      provider = new ();
     }
 
     const storeTabs = document.getElementById('storeTabs');
@@ -829,9 +829,9 @@
         signInBtn.hidden = true;
         signOutBtn.hidden = false;
       } else {
-        authText.textContent = 'Sign in with Google to sync your list across devices';
+        authText.textContent = 'Sign in (Email) to sync your list across devices';
         signInBtn.hidden = false;
-        signInBtn.textContent = 'Sign in with Google';
+        signInBtn.textContent = 'Sign in (Email)';
         signOutBtn.hidden = true;
       }
     }
