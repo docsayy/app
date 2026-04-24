@@ -12,14 +12,17 @@
       --muted:#6c8294;
       --border:#d9e4ea;
       --blue:#2f73b7;
+      --blue-dark:#245f98;
       --green:#2da44e;
       --green-dark:#23863f;
       --red:#b42318;
+      --orange:#a15c12;
       --shadow:0 12px 30px rgba(35,55,80,.08);
       --radius:24px;
     }
 
     *{box-sizing:border-box}
+
     body{
       margin:0;
       font-family:Arial, Helvetica, sans-serif;
@@ -28,32 +31,13 @@
     }
 
     .wrap{
-      max-width:860px;
+      max-width:900px;
       margin:0 auto;
-      padding:18px 16px 110px;
+      padding:18px 16px 130px;
       min-height:100vh;
     }
 
-    .topbar{
-      display:flex;
-      gap:12px;
-      align-items:center;
-      justify-content:space-between;
-      margin-bottom:18px;
-    }
-
-    .status-pill{
-      flex:1;
-      background:#fff;
-      border:1px solid var(--border);
-      border-radius:18px;
-      padding:16px 18px;
-      color:var(--muted);
-      box-shadow:var(--shadow);
-      min-height:56px;
-      display:flex;
-      align-items:center;
-    }
+    .hidden{display:none !important}
 
     .card{
       background:var(--card);
@@ -95,7 +79,8 @@
       letter-spacing:.04em;
     }
 
-    .field input{
+    .field input,
+    .field select{
       width:100%;
       padding:14px 14px;
       border-radius:14px;
@@ -105,17 +90,29 @@
       background:#fff;
     }
 
-    .field input:focus{
+    .field input:focus,
+    .field select:focus{
       border-color:var(--blue);
       box-shadow:0 0 0 4px rgba(47,115,183,.12);
+    }
+
+    .error-box{
+      display:none;
+      margin-bottom:14px;
+      background:#fff2f0;
+      color:var(--red);
+      border:1px solid #f0c2bc;
+      padding:12px 14px;
+      border-radius:14px;
+      font-size:14px;
     }
 
     .btn{
       border:none;
       border-radius:16px;
-      padding:14px 18px;
-      font-size:16px;
-      font-weight:700;
+      padding:13px 16px;
+      font-size:15px;
+      font-weight:800;
       cursor:pointer;
       transition:.18s ease;
     }
@@ -130,7 +127,7 @@
       color:#fff;
     }
 
-    .btn-primary:hover{filter:brightness(.98)}
+    .btn-primary:hover{background:var(--blue-dark)}
 
     .btn-green{
       background:var(--green);
@@ -145,10 +142,16 @@
       border:1px solid var(--border);
     }
 
+    .btn-danger{
+      background:#fff2f0;
+      color:var(--red);
+      border:1px solid #f0c2bc;
+    }
+
     .btn-small{
-      padding:10px 14px;
+      padding:9px 12px;
       border-radius:12px;
-      font-size:14px;
+      font-size:13px;
     }
 
     .auth-actions{
@@ -166,119 +169,290 @@
       text-align:center;
     }
 
-    .error-box{
-      display:none;
+    #appShell{display:none}
+
+    .topbar{
+      display:flex;
+      gap:12px;
+      align-items:center;
+      justify-content:space-between;
       margin-bottom:14px;
-      background:#fff2f0;
-      color:var(--red);
-      border:1px solid #f0c2bc;
-      padding:12px 14px;
-      border-radius:14px;
+    }
+
+    .status-pill{
+      flex:1;
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:14px 16px;
+      color:var(--muted);
+      box-shadow:var(--shadow);
+      min-height:52px;
+      display:flex;
+      align-items:center;
       font-size:14px;
     }
 
-    #appShell{display:none}
+    .header-card{
+      padding:16px;
+      margin-bottom:14px;
+    }
 
-    .lists{
-      display:grid;
-      gap:16px;
-      margin-top:10px;
+    .app-title{
+      margin:0 0 12px;
+      font-size:24px;
+      letter-spacing:.06em;
+      text-align:center;
+    }
+
+    .tabs{
+      display:flex;
+      gap:8px;
+      overflow-x:auto;
+      padding-bottom:4px;
+    }
+
+    .tab{
+      white-space:nowrap;
+      border:1px solid var(--border);
+      background:#fff;
+      color:var(--text);
+      padding:11px 14px;
+      border-radius:999px;
+      font-weight:800;
+      cursor:pointer;
+    }
+
+    .tab.active{
+      background:var(--blue);
+      color:#fff;
+      border-color:var(--blue);
+    }
+
+    .tab.add{
+      background:#eaf4ec;
+      color:#1f6d35;
+      border-color:#c6e5ce;
     }
 
     .panel{
-      padding:20px;
+      padding:18px;
+      margin-bottom:14px;
+    }
+
+    .section-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-bottom:12px;
     }
 
     .section-title{
-      text-align:center;
-      font-weight:800;
-      letter-spacing:.09em;
-      font-size:22px;
-      margin:8px 0 18px;
+      font-weight:900;
+      letter-spacing:.08em;
+      font-size:18px;
       color:#55748e;
     }
 
     .list{
       display:grid;
       gap:10px;
-      margin-top:10px;
+    }
+
+    .empty{
+      text-align:center;
+      color:var(--muted);
+      padding:20px 10px;
+      border:1px dashed var(--border);
+      border-radius:18px;
+      background:#fbfdfe;
     }
 
     .item{
       border:1px solid var(--border);
-      border-radius:16px;
+      border-radius:18px;
       padding:12px;
       background:#fbfdfe;
     }
 
+    .item.checked{
+      background:#f0fbf3;
+      border-color:#b8dec3;
+    }
+
     .item-top{
       display:flex;
-      justify-content:space-between;
       gap:10px;
       align-items:flex-start;
+      justify-content:space-between;
+    }
+
+    .item-main{
+      min-width:0;
     }
 
     .item-name{
-      font-weight:700;
+      font-weight:900;
       font-size:16px;
+      word-break:break-word;
     }
 
     .item-meta{
       color:var(--muted);
       font-size:13px;
       margin-top:4px;
+      line-height:1.45;
+    }
+
+    .check-btn{
+      min-width:42px;
+      height:42px;
+      border-radius:14px;
+      border:2px solid #b8c9d5;
+      background:#fff;
+      font-size:20px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-shrink:0;
+    }
+
+    .check-btn.checked{
+      background:#e8f4ec;
+      border-color:#7cc28e;
     }
 
     .item-actions{
       display:flex;
       gap:8px;
       flex-wrap:wrap;
-      margin-top:10px;
+      margin-top:12px;
     }
 
     .chip{
       font-size:12px;
-      padding:7px 10px;
+      padding:8px 10px;
       border-radius:999px;
       border:1px solid var(--border);
       background:#fff;
       cursor:pointer;
-      font-weight:700;
+      font-weight:800;
+      color:var(--text);
     }
 
-    .chip.active{
-      background:#e8f4ec;
-      border-color:#b8dec3;
-      color:#1f6d35;
+    .chip.saved{
+      background:#f8f1e8;
+      color:var(--orange);
+      border-color:#ead2b8;
     }
 
-    .saved-head{
+    .chip.delete{
+      background:#fff2f0;
+      color:var(--red);
+      border-color:#f0c2bc;
+    }
+
+    .summary-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-bottom:14px;
+    }
+
+    .summary-box{
+      background:#fff;
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:12px;
+    }
+
+    .summary-label{
+      font-size:11px;
+      font-weight:900;
+      color:var(--muted);
+      letter-spacing:.1em;
+    }
+
+    .summary-value{
+      font-size:20px;
+      font-weight:900;
+      color:#7e173f;
+      margin-top:3px;
+    }
+
+    .history-item{
+      border:1px solid var(--border);
+      background:#fbfdfe;
+      border-radius:18px;
+      padding:12px;
+    }
+
+    .history-top{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      font-weight:900;
+    }
+
+    .history-meta{
+      color:var(--muted);
+      font-size:13px;
+      margin-top:5px;
+    }
+
+    .history-details{
+      margin-top:10px;
+      font-size:13px;
+      color:var(--text);
+      line-height:1.5;
+    }
+
+    .account-box{
+      padding:14px 16px;
+      color:var(--muted);
+      font-size:13px;
       display:flex;
       justify-content:space-between;
       align-items:center;
-      gap:12px;
-      cursor:pointer;
-      user-select:none;
+      gap:10px;
+      flex-wrap:wrap;
     }
 
-    .saved-title{
-      font-size:16px;
-      font-weight:800;
-      letter-spacing:.06em;
-      color:#55748e;
+    .modal{
+      position:fixed;
+      inset:0;
+      background:rgba(20,35,50,.38);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      z-index:50;
     }
 
-    .count{
-      color:var(--muted);
-      font-weight:700;
+    .modal-card{
+      width:100%;
+      max-width:460px;
+      background:#fff;
+      border-radius:24px;
+      padding:22px;
+      box-shadow:0 20px 60px rgba(20,35,50,.25);
+      max-height:90vh;
+      overflow:auto;
     }
 
-    .hidden{display:none !important}
-
-    .empty{
+    .modal-card h2{
+      margin:0 0 18px;
       text-align:center;
-      color:var(--muted);
-      padding:20px 10px;
+      color:var(--text);
+    }
+
+    .modal-actions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:8px;
     }
 
     .bottom-bar{
@@ -286,18 +460,19 @@
       left:0;
       right:0;
       bottom:0;
-      background:rgba(238,245,247,.95);
+      background:rgba(238,245,247,.96);
       backdrop-filter:blur(10px);
       border-top:1px solid var(--border);
       padding:12px 14px;
+      z-index:20;
     }
 
     .bottom-inner{
-      max-width:860px;
+      max-width:900px;
       margin:0 auto;
-      display:flex;
-      gap:12px;
-      justify-content:space-between;
+      display:grid;
+      grid-template-columns:1fr auto auto;
+      gap:10px;
       align-items:center;
     }
 
@@ -306,77 +481,37 @@
       border:1px solid var(--border);
       box-shadow:var(--shadow);
       border-radius:18px;
-      padding:12px 16px;
-      min-width:180px;
+      padding:10px 14px;
     }
 
     .total-label{
-      font-size:12px;
-      font-weight:800;
-      letter-spacing:.12em;
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.1em;
       color:#7e4b65;
     }
 
     .total-value{
       font-size:18px;
-      font-weight:800;
+      font-weight:900;
       color:#7e173f;
-    }
-
-    .account-row{
-      margin-top:14px;
-      display:flex;
-      justify-content:flex-end;
-      gap:8px;
-      flex-wrap:wrap;
-    }
-
-    .account-box{
-      margin-top:18px;
-      padding:14px 16px;
-      border-top:1px solid var(--border);
-      color:var(--muted);
-      font-size:13px;
-      display:flex;
-      justify-content:space-between;
-      align-items:center;
-      gap:10px;
-      flex-wrap:wrap;
-    }
-
-    .inline-form{
-      display:grid;
-      grid-template-columns:1.3fr .8fr .8fr;
-      gap:10px;
-      margin-top:16px;
-    }
-
-    .inline-form input{
-      width:100%;
-      padding:13px 12px;
-      border-radius:14px;
-      border:2px solid #cfdbe3;
-      outline:none;
-      font-size:15px;
-      background:#fff;
-    }
-
-    .inline-form input:focus{
-      border-color:var(--blue);
-      box-shadow:0 0 0 4px rgba(47,115,183,.12);
     }
 
     @media (max-width:700px){
       .auth-actions,
-      .inline-form{
+      .modal-actions,
+      .summary-grid{
         grid-template-columns:1fr;
       }
 
       .bottom-inner{
-        align-items:stretch;
+        grid-template-columns:1fr;
       }
 
-      .total-box{min-width:unset}
+      .topbar{
+        flex-direction:column;
+        align-items:stretch;
+      }
     }
   </style>
 </head>
@@ -384,7 +519,7 @@
   <div class="wrap">
     <div id="authScreen" class="card auth-card">
       <h1 class="auth-title">GROCERY APP</h1>
-      <p class="auth-sub">Sign in with email and password to open your shared grocery list.</p>
+      <p class="auth-sub">Sign in with email and password to open your grocery list.</p>
 
       <div id="authError" class="error-box"></div>
 
@@ -404,7 +539,7 @@
       </div>
 
       <p class="auth-note">
-        First time? Use <b>Create Account</b> once, then later just sign in normally.
+        First time? Use <b>Create Account</b> once, then later use <b>Sign In</b>.
       </p>
     </div>
 
@@ -413,40 +548,63 @@
         <div id="authStatus" class="status-pill">Signed in</div>
       </div>
 
-      <div class="lists">
-        <div class="card panel">
-          <div class="section-title">HAVE TO GET</div>
+      <div class="card header-card">
+        <h1 class="app-title">GROCERY LIST</h1>
+        <div id="storeTabs" class="tabs"></div>
+      </div>
 
-          <div class="inline-form">
-            <input id="itemNameInput" type="text" placeholder="Item name" />
-            <input id="itemPriceInput" type="text" placeholder="Price e.g. 3.99 or 9.99/2" />
-            <input id="itemStoreInput" type="text" placeholder="Store" />
-          </div>
-
-          <div class="account-row" style="justify-content:flex-start; margin-top:12px;">
-            <button id="quickAddBtn" class="btn btn-green btn-small">Add Item</button>
-          </div>
-
-          <div id="needList" class="list"></div>
-
-          <div class="section-title" style="margin-top:28px;">GOT</div>
-          <div id="gotList" class="list"></div>
-
-          <div class="account-box">
-            <div>
-              <strong>SAVED</strong>
-              <span id="savedCount" class="count">0 items</span>
-            </div>
-            <button id="toggleSavedBtn" class="btn btn-ghost btn-small">Show / Hide</button>
-          </div>
-
-          <div id="savedWrap" class="hidden">
-            <div id="savedList" class="list" style="margin-top:14px;"></div>
-          </div>
+      <div class="summary-grid">
+        <div class="summary-box">
+          <div class="summary-label">CURRENT STORE</div>
+          <div id="currentStoreLabel" class="summary-value">Costco</div>
+        </div>
+        <div class="summary-box">
+          <div class="summary-label">PICKED TOTAL</div>
+          <div id="pickedTotal" class="summary-value">$0.00</div>
         </div>
       </div>
 
-      <div class="account-row">
+      <div class="card panel">
+        <div class="section-head">
+          <div class="section-title">HAVE TO GET</div>
+          <button id="finishShoppingTopBtn" class="btn btn-green btn-small">Finish Shopping</button>
+        </div>
+        <div id="needList" class="list"></div>
+      </div>
+
+      <div class="card panel">
+        <div class="section-head">
+          <div class="section-title">GOT</div>
+          <div id="gotCount" style="color:var(--muted);font-weight:800;">0 items</div>
+        </div>
+        <div id="gotList" class="list"></div>
+      </div>
+
+      <div class="card panel">
+        <div class="section-head">
+          <div>
+            <div class="section-title">SAVED ITEMS</div>
+            <div id="savedCount" style="color:var(--muted);font-size:13px;margin-top:3px;">0 items</div>
+          </div>
+          <button id="toggleSavedBtn" class="btn btn-ghost btn-small">Show / Hide</button>
+        </div>
+        <div id="savedWrap" class="hidden">
+          <div id="savedList" class="list"></div>
+        </div>
+      </div>
+
+      <div class="card panel">
+        <div class="section-head">
+          <div class="section-title">SHOPPING HISTORY</div>
+          <button id="toggleHistoryBtn" class="btn btn-ghost btn-small">Show / Hide</button>
+        </div>
+        <div id="historyWrap" class="hidden">
+          <div id="historyList" class="list"></div>
+        </div>
+      </div>
+
+      <div class="card account-box">
+        <div id="accountText">Account</div>
         <button id="signOutBtn" class="btn btn-ghost btn-small">Sign Out</button>
       </div>
     </div>
@@ -456,10 +614,41 @@
     <div class="bottom-inner">
       <div class="total-box">
         <div class="total-label">PICKED TOTAL</div>
-        <div id="pickedTotal" class="total-value">$0.00</div>
+        <div id="pickedTotalBottom" class="total-value">$0.00</div>
+      </div>
+      <button id="bottomAddBtn" class="btn btn-green">+ Add Item</button>
+      <button id="finishShoppingBtn" class="btn btn-primary">Finish Shopping</button>
+    </div>
+  </div>
+
+  <div id="addModal" class="modal hidden">
+    <div class="modal-card">
+      <h2>Add Item</h2>
+
+      <div class="field">
+        <label for="itemNameInput">ITEM NAME</label>
+        <input id="itemNameInput" type="text" placeholder="Milk, eggs, rice..." />
       </div>
 
-      <button id="bottomAddBtn" class="btn btn-green">+ Add Item</button>
+      <div class="field">
+        <label for="itemQtyInput">NUMBER NEEDED</label>
+        <input id="itemQtyInput" type="number" min="1" value="1" />
+      </div>
+
+      <div class="field">
+        <label for="itemPriceInput">PRICE</label>
+        <input id="itemPriceInput" type="text" placeholder="3.99 or 9.99/2" />
+      </div>
+
+      <div class="field">
+        <label for="itemStoreInput">STORE</label>
+        <select id="itemStoreInput"></select>
+      </div>
+
+      <div class="modal-actions">
+        <button id="saveModalItemBtn" class="btn btn-green">Save Item</button>
+        <button id="closeModalBtn" class="btn btn-ghost">Cancel</button>
+      </div>
     </div>
   </div>
 
@@ -482,7 +671,8 @@
       doc,
       query,
       orderBy,
-      serverTimestamp
+      serverTimestamp,
+      writeBatch
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
     const firebaseConfig = {
@@ -498,10 +688,13 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    const DEFAULT_STORES = ["Costco", "ShopRite"];
+
     const authScreen = document.getElementById("authScreen");
     const appShell = document.getElementById("appShell");
     const bottomBar = document.getElementById("bottomBar");
     const authStatus = document.getElementById("authStatus");
+    const accountText = document.getElementById("accountText");
     const authError = document.getElementById("authError");
 
     const emailInput = document.getElementById("emailInput");
@@ -510,23 +703,43 @@
     const createAccountBtn = document.getElementById("createAccountBtn");
     const signOutBtn = document.getElementById("signOutBtn");
 
-    const itemNameInput = document.getElementById("itemNameInput");
-    const itemPriceInput = document.getElementById("itemPriceInput");
-    const itemStoreInput = document.getElementById("itemStoreInput");
-    const quickAddBtn = document.getElementById("quickAddBtn");
-    const bottomAddBtn = document.getElementById("bottomAddBtn");
+    const storeTabs = document.getElementById("storeTabs");
+    const currentStoreLabel = document.getElementById("currentStoreLabel");
 
     const needList = document.getElementById("needList");
     const gotList = document.getElementById("gotList");
     const savedList = document.getElementById("savedList");
-    const savedWrap = document.getElementById("savedWrap");
-    const toggleSavedBtn = document.getElementById("toggleSavedBtn");
-    const savedCount = document.getElementById("savedCount");
-    const pickedTotal = document.getElementById("pickedTotal");
+    const historyList = document.getElementById("historyList");
 
-    let unsubscribeItems = null;
+    const savedWrap = document.getElementById("savedWrap");
+    const historyWrap = document.getElementById("historyWrap");
+    const toggleSavedBtn = document.getElementById("toggleSavedBtn");
+    const toggleHistoryBtn = document.getElementById("toggleHistoryBtn");
+
+    const savedCount = document.getElementById("savedCount");
+    const gotCount = document.getElementById("gotCount");
+    const pickedTotal = document.getElementById("pickedTotal");
+    const pickedTotalBottom = document.getElementById("pickedTotalBottom");
+
+    const bottomAddBtn = document.getElementById("bottomAddBtn");
+    const finishShoppingBtn = document.getElementById("finishShoppingBtn");
+    const finishShoppingTopBtn = document.getElementById("finishShoppingTopBtn");
+
+    const addModal = document.getElementById("addModal");
+    const itemNameInput = document.getElementById("itemNameInput");
+    const itemQtyInput = document.getElementById("itemQtyInput");
+    const itemPriceInput = document.getElementById("itemPriceInput");
+    const itemStoreInput = document.getElementById("itemStoreInput");
+    const saveModalItemBtn = document.getElementById("saveModalItemBtn");
+    const closeModalBtn = document.getElementById("closeModalBtn");
+
     let currentUser = null;
     let currentItems = [];
+    let receipts = [];
+    let stores = [...DEFAULT_STORES];
+    let selectedStore = "Costco";
+    let unsubscribeItems = null;
+    let unsubscribeReceipts = null;
 
     function showError(message) {
       authError.textContent = message;
@@ -545,13 +758,26 @@
       createAccountBtn.textContent = loading ? "Please wait..." : "Create Account";
     }
 
+    function escapeHtml(str) {
+      return String(str ?? "")
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;")
+        .replaceAll('"', "&quot;")
+        .replaceAll("'", "&#039;");
+    }
+
+    function money(value) {
+      return `$${Number(value || 0).toFixed(2)}`;
+    }
+
     function parsePriceNumber(priceText) {
       if (!priceText) return 0;
       const cleaned = String(priceText).trim();
 
-      const saleMatch = cleaned.match(/^(\d+(\.\d+)?)\s*\/\s*(\d+(\.\d+)?)$/);
-      if (saleMatch) {
-        const total = parseFloat(saleMatch[1]);
+      const forMatch = cleaned.match(/^(\d+(\.\d+)?)\s*(for|\/)\s*(\d+(\.\d+)?)$/i);
+      if (forMatch) {
+        const total = parseFloat(forMatch[1]);
         return isNaN(total) ? 0 : total;
       }
 
@@ -562,8 +788,25 @@
       return isNaN(value) ? 0 : value;
     }
 
-    function money(value) {
-      return `$${value.toFixed(2)}`;
+    function itemTotal(item) {
+      return parsePriceNumber(item.price) * (Number(item.quantity) || 1);
+    }
+
+    function normalizeStoreName(name) {
+      return String(name || "").trim();
+    }
+
+    function openAddModal() {
+      itemNameInput.value = "";
+      itemQtyInput.value = "1";
+      itemPriceInput.value = "";
+      itemStoreInput.value = selectedStore;
+      addModal.classList.remove("hidden");
+      setTimeout(() => itemNameInput.focus(), 50);
+    }
+
+    function closeAddModal() {
+      addModal.classList.add("hidden");
     }
 
     async function handleSignIn() {
@@ -622,17 +865,67 @@
       }
     }
 
+    function renderStoreTabs() {
+      const itemStores = currentItems.map(i => i.store).filter(Boolean);
+      const receiptStores = receipts.map(r => r.store).filter(Boolean);
+      stores = Array.from(new Set([...DEFAULT_STORES, ...stores, ...itemStores, ...receiptStores]));
+
+      if (!stores.includes(selectedStore)) selectedStore = stores[0] || "Costco";
+
+      storeTabs.innerHTML = "";
+
+      stores.forEach(store => {
+        const btn = document.createElement("button");
+        btn.className = `tab ${store === selectedStore ? "active" : ""}`;
+        btn.textContent = store;
+        btn.addEventListener("click", () => {
+          selectedStore = store;
+          renderAll();
+        });
+        storeTabs.appendChild(btn);
+      });
+
+      const addBtn = document.createElement("button");
+      addBtn.className = "tab add";
+      addBtn.textContent = "+ Add Store";
+      addBtn.addEventListener("click", () => {
+        const storeName = normalizeStoreName(prompt("New store name:"));
+        if (!storeName) return;
+        stores.push(storeName);
+        selectedStore = storeName;
+        renderAll();
+      });
+      storeTabs.appendChild(addBtn);
+
+      itemStoreInput.innerHTML = "";
+      stores.forEach(store => {
+        const opt = document.createElement("option");
+        opt.value = store;
+        opt.textContent = store;
+        itemStoreInput.appendChild(opt);
+      });
+
+      currentStoreLabel.textContent = selectedStore;
+    }
+
+    function renderAll() {
+      renderStoreTabs();
+      renderItems();
+      renderHistory();
+    }
+
     function renderItems() {
       needList.innerHTML = "";
       gotList.innerHTML = "";
       savedList.innerHTML = "";
 
-      const need = currentItems.filter(i => i.status === "need");
-      const got = currentItems.filter(i => i.status === "got");
-      const saved = currentItems.filter(i => i.status === "saved");
+      const visibleItems = currentItems.filter(i => (i.store || "Costco") === selectedStore);
+      const need = visibleItems.filter(i => i.status === "need");
+      const got = visibleItems.filter(i => i.status === "got");
+      const saved = visibleItems.filter(i => i.status === "saved");
 
       if (!need.length) {
-        needList.innerHTML = `<div class="empty">No items in Have to Get.</div>`;
+        needList.innerHTML = `<div class="empty">No items to buy for ${escapeHtml(selectedStore)}.</div>`;
       } else {
         need.forEach(item => needList.appendChild(buildItemCard(item)));
       }
@@ -644,46 +937,62 @@
       }
 
       if (!saved.length) {
-        savedList.innerHTML = `<div class="empty">No saved items.</div>`;
+        savedList.innerHTML = `<div class="empty">No saved items for ${escapeHtml(selectedStore)}.</div>`;
       } else {
         saved.forEach(item => savedList.appendChild(buildItemCard(item)));
       }
 
-      savedCount.textContent = `${saved.length} item${saved.length === 1 ? "" : "s"}`;
-
-      const total = got.reduce((sum, item) => sum + parsePriceNumber(item.price), 0);
+      const total = got.reduce((sum, item) => sum + itemTotal(item), 0);
       pickedTotal.textContent = money(total);
+      pickedTotalBottom.textContent = money(total);
+      gotCount.textContent = `${got.length} item${got.length === 1 ? "" : "s"}`;
+      savedCount.textContent = `${saved.length} item${saved.length === 1 ? "" : "s"}`;
     }
 
     function buildItemCard(item) {
       const div = document.createElement("div");
-      div.className = "item";
+      div.className = `item ${item.status === "got" ? "checked" : ""}`;
+
+      const total = itemTotal(item);
+
+      let actions = "";
+      if (item.status === "saved") {
+        actions = `
+          <button class="chip" data-action="need">Add to Have to Get</button>
+          <button class="chip delete" data-action="delete">Delete</button>
+        `;
+      } else {
+        actions = `
+          <button class="chip saved" data-action="saved">Save for Later</button>
+          <button class="chip delete" data-action="delete">Delete</button>
+        `;
+      }
 
       div.innerHTML = `
         <div class="item-top">
-          <div>
-            <div class="item-name">${escapeHtml(item.name || "Untitled item")}</div>
+          <button class="check-btn ${item.status === "got" ? "checked" : ""}" data-action="${item.status === "got" ? "need" : "got"}">
+            ${item.status === "got" ? "✓" : ""}
+          </button>
+          <div class="item-main">
+            <div class="item-name">${escapeHtml(item.name || "Untitled item")} × ${item.quantity || 1}</div>
             <div class="item-meta">
               ${item.price ? `Price: ${escapeHtml(item.price)}` : "No price"}
+              ${total ? ` • Total: ${money(total)}` : ""}
               ${item.store ? ` • Store: ${escapeHtml(item.store)}` : ""}
             </div>
           </div>
         </div>
-        <div class="item-actions">
-          <button class="chip ${item.status === "need" ? "active" : ""}" data-action="need">Have to Get</button>
-          <button class="chip ${item.status === "got" ? "active" : ""}" data-action="got">Got</button>
-          <button class="chip ${item.status === "saved" ? "active" : ""}" data-action="saved">Saved</button>
-          <button class="chip" data-action="delete">Delete</button>
-        </div>
+        <div class="item-actions">${actions}</div>
       `;
 
-      div.querySelectorAll(".chip").forEach(btn => {
+      div.querySelectorAll("[data-action]").forEach(btn => {
         btn.addEventListener("click", async () => {
           const action = btn.dataset.action;
           const ref = doc(db, "groceryItems", item.id);
 
           try {
             if (action === "delete") {
+              if (!confirm(`Delete ${item.name}?`)) return;
               await deleteDoc(ref);
             } else {
               await updateDoc(ref, { status: action });
@@ -698,15 +1007,6 @@
       return div;
     }
 
-    function escapeHtml(str) {
-      return String(str)
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
-    }
-
     async function handleAddItem() {
       if (!currentUser) {
         alert("Please sign in first.");
@@ -714,8 +1014,9 @@
       }
 
       const name = itemNameInput.value.trim();
+      const quantity = parseInt(itemQtyInput.value, 10) || 1;
       const price = itemPriceInput.value.trim();
-      const store = itemStoreInput.value.trim();
+      const store = itemStoreInput.value || selectedStore;
 
       if (!name) {
         alert("Enter an item name.");
@@ -726,6 +1027,7 @@
       try {
         await addDoc(collection(db, "groceryItems"), {
           name,
+          quantity,
           price,
           store,
           status: "need",
@@ -733,14 +1035,101 @@
           createdAt: serverTimestamp()
         });
 
-        itemNameInput.value = "";
-        itemPriceInput.value = "";
-        itemStoreInput.value = "";
-        itemNameInput.focus();
+        selectedStore = store;
+        closeAddModal();
       } catch (err) {
         alert(err.message);
         console.error(err);
       }
+    }
+
+    async function finishShopping() {
+      if (!currentUser) {
+        alert("Please sign in first.");
+        return;
+      }
+
+      const gotItems = currentItems.filter(i => (i.store || "Costco") === selectedStore && i.status === "got");
+
+      if (!gotItems.length) {
+        alert("No checked items to save for this store.");
+        return;
+      }
+
+      const total = gotItems.reduce((sum, item) => sum + itemTotal(item), 0);
+
+      const ok = confirm(`Save receipt for ${selectedStore} with ${gotItems.length} item(s), total ${money(total)}?`);
+      if (!ok) return;
+
+      try {
+        await addDoc(collection(db, "receipts"), {
+          store: selectedStore,
+          total,
+          itemCount: gotItems.length,
+          items: gotItems.map(item => ({
+            name: item.name || "",
+            quantity: item.quantity || 1,
+            price: item.price || "",
+            total: itemTotal(item)
+          })),
+          createdBy: currentUser.email || currentUser.uid,
+          createdAt: serverTimestamp(),
+          createdAtText: new Date().toISOString()
+        });
+
+        const batch = writeBatch(db);
+        gotItems.forEach(item => {
+          const ref = doc(db, "groceryItems", item.id);
+          batch.update(ref, { status: "saved" });
+        });
+        await batch.commit();
+
+        alert("Shopping receipt saved. Picked items moved to Saved.");
+      } catch (err) {
+        alert(err.message);
+        console.error(err);
+      }
+    }
+
+    function renderHistory() {
+      historyList.innerHTML = "";
+
+      const filtered = receipts.filter(r => (r.store || "Costco") === selectedStore);
+
+      if (!filtered.length) {
+        historyList.innerHTML = `<div class="empty">No shopping history for ${escapeHtml(selectedStore)} yet.</div>`;
+        return;
+      }
+
+      filtered.forEach(receipt => {
+        const div = document.createElement("div");
+        div.className = "history-item";
+
+        const date = receipt.createdAt?.toDate
+          ? receipt.createdAt.toDate()
+          : receipt.createdAtText
+            ? new Date(receipt.createdAtText)
+            : null;
+
+        const dateText = date && !isNaN(date)
+          ? date.toLocaleString([], { month:"short", day:"numeric", year:"numeric", hour:"numeric", minute:"2-digit" })
+          : "Saved receipt";
+
+        const itemLines = (receipt.items || [])
+          .map(i => `${escapeHtml(i.name)} × ${i.quantity || 1} — ${i.price ? escapeHtml(i.price) : "no price"}${i.total ? ` (${money(i.total)})` : ""}`)
+          .join("<br>");
+
+        div.innerHTML = `
+          <div class="history-top">
+            <div>${escapeHtml(receipt.store || selectedStore)}</div>
+            <div>${money(receipt.total || 0)}</div>
+          </div>
+          <div class="history-meta">${dateText} • ${receipt.itemCount || (receipt.items || []).length} item(s)</div>
+          <div class="history-details">${itemLines || "No item details."}</div>
+        `;
+
+        historyList.appendChild(div);
+      });
     }
 
     function watchItems() {
@@ -748,25 +1137,43 @@
 
       const q = query(collection(db, "groceryItems"), orderBy("createdAt", "desc"));
       unsubscribeItems = onSnapshot(q, (snap) => {
-        currentItems = snap.docs.map(d => ({
-          id: d.id,
-          ...d.data()
-        }));
-        renderItems();
+        currentItems = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderAll();
       }, (err) => {
         console.error(err);
         alert("Could not load grocery items. Check Firestore rules.");
       });
     }
 
+    function watchReceipts() {
+      if (unsubscribeReceipts) unsubscribeReceipts();
+
+      const q = query(collection(db, "receipts"), orderBy("createdAt", "desc"));
+      unsubscribeReceipts = onSnapshot(q, (snap) => {
+        receipts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+        renderAll();
+      }, (err) => {
+        console.error(err);
+        alert("Could not load shopping history. Check Firestore rules for receipts.");
+      });
+    }
+
     signInBtn.addEventListener("click", handleSignIn);
     createAccountBtn.addEventListener("click", handleCreateAccount);
     signOutBtn.addEventListener("click", handleSignOut);
-    quickAddBtn.addEventListener("click", handleAddItem);
-    bottomAddBtn.addEventListener("click", handleAddItem);
 
-    toggleSavedBtn.addEventListener("click", () => {
-      savedWrap.classList.toggle("hidden");
+    bottomAddBtn.addEventListener("click", openAddModal);
+    saveModalItemBtn.addEventListener("click", handleAddItem);
+    closeModalBtn.addEventListener("click", closeAddModal);
+
+    finishShoppingBtn.addEventListener("click", finishShopping);
+    finishShoppingTopBtn.addEventListener("click", finishShopping);
+
+    toggleSavedBtn.addEventListener("click", () => savedWrap.classList.toggle("hidden"));
+    toggleHistoryBtn.addEventListener("click", () => historyWrap.classList.toggle("hidden"));
+
+    addModal.addEventListener("click", (e) => {
+      if (e.target === addModal) closeAddModal();
     });
 
     [emailInput, passwordInput].forEach(el => {
@@ -775,7 +1182,7 @@
       });
     });
 
-    [itemNameInput, itemPriceInput, itemStoreInput].forEach(el => {
+    [itemNameInput, itemQtyInput, itemPriceInput].forEach(el => {
       el.addEventListener("keydown", (e) => {
         if (e.key === "Enter") handleAddItem();
       });
@@ -789,18 +1196,25 @@
         appShell.style.display = "block";
         bottomBar.classList.remove("hidden");
         authStatus.textContent = `Signed in as ${user.email}`;
+        accountText.textContent = `Account: ${user.email}`;
         watchItems();
+        watchReceipts();
       } else {
         authScreen.style.display = "block";
         appShell.style.display = "none";
         bottomBar.classList.add("hidden");
-        authStatus.textContent = "Not signed in";
         currentItems = [];
-        renderItems();
+        receipts = [];
+        renderAll();
 
         if (unsubscribeItems) {
           unsubscribeItems();
           unsubscribeItems = null;
+        }
+
+        if (unsubscribeReceipts) {
+          unsubscribeReceipts();
+          unsubscribeReceipts = null;
         }
       }
     });
