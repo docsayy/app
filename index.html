@@ -499,6 +499,40 @@
       color:#7e173f;
     }
 
+
+    .suggestions{
+      margin-top:8px;
+      border:1px solid var(--border);
+      border-radius:14px;
+      overflow:hidden;
+      background:#fff;
+    }
+
+    .suggestion{
+      padding:11px 12px;
+      cursor:pointer;
+      border-bottom:1px solid var(--border);
+      font-size:14px;
+    }
+
+    .suggestion:last-child{border-bottom:0}
+
+    .suggestion:hover{background:#f4f8fa}
+
+    .suggestion strong{color:var(--text)}
+
+    .suggestion span{
+      display:block;
+      margin-top:3px;
+      color:var(--muted);
+      font-size:12px;
+    }
+
+    .check-btn:disabled{
+      opacity:.45;
+      cursor:not-allowed;
+    }
+
     @media (max-width:700px){
       .auth-actions,
       .modal-actions,
@@ -587,6 +621,19 @@
 
       <div class="card panel">
         <div class="section-head">
+          <div>
+            <div class="section-title">FUTURE LIST</div>
+            <div id="futureCount" style="color:var(--muted);font-size:13px;margin-top:3px;">0 items</div>
+          </div>
+          <button id="toggleFutureBtn" class="btn btn-ghost btn-small">Show / Hide</button>
+        </div>
+        <div id="futureWrap" class="hidden">
+          <div id="futureList" class="list"></div>
+        </div>
+      </div>
+
+      <div class="card panel">
+        <div class="section-head">
           <div class="section-title">SHOPPING HISTORY</div>
           <button id="toggleHistoryBtn" class="btn btn-ghost btn-small">Show / Hide</button>
         </div>
@@ -620,6 +667,7 @@
       <div class="field">
         <label for="itemNameInput">ITEM NAME</label>
         <input id="itemNameInput" type="text" placeholder="Milk, eggs, rice..." />
+        <div id="suggestionsBox" class="suggestions hidden"></div>
       </div>
 
       <div class="field">
@@ -700,14 +748,18 @@
     const needList = document.getElementById("needList");
     const gotList = document.getElementById("gotList");
     const savedList = document.getElementById("savedList");
+    const futureList = document.getElementById("futureList");
     const historyList = document.getElementById("historyList");
 
     const savedWrap = document.getElementById("savedWrap");
+    const futureWrap = document.getElementById("futureWrap");
     const historyWrap = document.getElementById("historyWrap");
     const toggleSavedBtn = document.getElementById("toggleSavedBtn");
+    const toggleFutureBtn = document.getElementById("toggleFutureBtn");
     const toggleHistoryBtn = document.getElementById("toggleHistoryBtn");
 
     const savedCount = document.getElementById("savedCount");
+    const futureCount = document.getElementById("futureCount");
     const gotCount = document.getElementById("gotCount");
     const pickedTotal = document.getElementById("pickedTotal");
     const pickedTotalBottom = document.getElementById("pickedTotalBottom");
@@ -721,6 +773,7 @@
     const itemQtyInput = document.getElementById("itemQtyInput");
     const itemPriceInput = document.getElementById("itemPriceInput");
     const itemStoreInput = document.getElementById("itemStoreInput");
+    const suggestionsBox = document.getElementById("suggestionsBox");
     const saveModalItemBtn = document.getElementById("saveModalItemBtn");
     const closeModalBtn = document.getElementById("closeModalBtn");
 
@@ -729,6 +782,7 @@
     let receipts = [];
     let stores = [...DEFAULT_STORES];
     let selectedStore = "Costco";
+    let editingItemId = null;
     let unsubscribeItems = null;
     let unsubscribeReceipts = null;
 
@@ -787,17 +841,21 @@
       return String(name || "").trim();
     }
 
-    function openAddModal() {
-      itemNameInput.value = "";
-      itemQtyInput.value = "1";
-      itemPriceInput.value = "";
-      itemStoreInput.value = selectedStore;
+    function openAddModal(sourceItem = null) {
+      editingItemId = sourceItem?.id || null;
+      itemNameInput.value = sourceItem?.name || "";
+      itemQtyInput.value = sourceItem?.quantity || "1";
+      itemPriceInput.value = sourceItem?.price || "";
+      itemStoreInput.value = sourceItem?.store || selectedStore;
+      suggestionsBox.classList.add("hidden");
       addModal.classList.remove("hidden");
       setTimeout(() => itemNameInput.focus(), 50);
     }
 
     function closeAddModal() {
       addModal.classList.add("hidden");
+      editingItemId = null;
+      suggestionsBox.classList.add("hidden");
     }
 
     async function handleSignIn() {
@@ -909,11 +967,13 @@
       needList.innerHTML = "";
       gotList.innerHTML = "";
       savedList.innerHTML = "";
+      futureList.innerHTML = "";
 
       const visibleItems = currentItems.filter(i => (i.store || "Costco") === selectedStore);
       const need = visibleItems.filter(i => i.status === "need");
       const got = visibleItems.filter(i => i.status === "got");
       const saved = visibleItems.filter(i => i.status === "saved");
+      const future = visibleItems.filter(i => i.status === "future");
 
       if (!need.length) {
         needList.innerHTML = `<div class="empty">No items to buy for ${escapeHtml(selectedStore)}.</div>`;
@@ -933,11 +993,18 @@
         saved.forEach(item => savedList.appendChild(buildItemCard(item)));
       }
 
+      if (!future.length) {
+        futureList.innerHTML = `<div class="empty">No future items for ${escapeHtml(selectedStore)}.</div>`;
+      } else {
+        future.forEach(item => futureList.appendChild(buildItemCard(item)));
+      }
+
       const total = got.reduce((sum, item) => sum + itemTotal(item), 0);
       pickedTotal.textContent = money(total);
       pickedTotalBottom.textContent = money(total);
       gotCount.textContent = `${got.length} item${got.length === 1 ? "" : "s"}`;
       savedCount.textContent = `${saved.length} item${saved.length === 1 ? "" : "s"}`;
+      futureCount.textContent = `${future.length} item${future.length === 1 ? "" : "s"}`;
     }
 
     function buildItemCard(item) {
@@ -945,23 +1012,35 @@
       div.className = `item ${item.status === "got" ? "checked" : ""}`;
 
       const total = itemTotal(item);
+      const isSaved = item.status === "saved";
+      const isFuture = item.status === "future";
 
       let actions = "";
-      if (item.status === "saved") {
+      if (isSaved) {
+        actions = `
+          <button class="chip" data-action="addSaved">Add to List</button>
+          <button class="chip delete" data-action="delete">Delete</button>
+        `;
+      } else if (isFuture) {
         actions = `
           <button class="chip" data-action="need">Add to Have to Get</button>
+          <button class="chip saved" data-action="saved">Move to Saved</button>
           <button class="chip delete" data-action="delete">Delete</button>
         `;
       } else {
         actions = `
           <button class="chip saved" data-action="saved">Save for Later</button>
+          <button class="chip" data-action="future">Future List</button>
           <button class="chip delete" data-action="delete">Delete</button>
         `;
       }
 
+      const checkAction = item.status === "got" ? "need" : "got";
+      const checkDisabled = isSaved || isFuture;
+
       div.innerHTML = `
         <div class="item-top">
-          <button class="check-btn ${item.status === "got" ? "checked" : ""}" data-action="${item.status === "got" ? "need" : "got"}">
+          <button class="check-btn ${item.status === "got" ? "checked" : ""}" ${checkDisabled ? "disabled" : ""} data-action="${checkAction}">
             ${item.status === "got" ? "✓" : ""}
           </button>
           <div class="item-main">
@@ -985,6 +1064,8 @@
             if (action === "delete") {
               if (!confirm(`Delete ${item.name}?`)) return;
               await deleteDoc(ref);
+            } else if (action === "addSaved") {
+              openAddModal(item);
             } else {
               await updateDoc(ref, { status: action });
             }
@@ -1016,15 +1097,46 @@
       }
 
       try {
-        await addDoc(collection(db, "groceryItems"), {
-          name,
-          quantity,
-          price,
-          store,
-          status: "need",
-          createdBy: currentUser.email || currentUser.uid,
-          createdAt: serverTimestamp()
-        });
+        if (editingItemId) {
+          const ref = doc(db, "groceryItems", editingItemId);
+          await updateDoc(ref, {
+            name,
+            quantity,
+            price,
+            store,
+            status: "need"
+          });
+        } else {
+          const sameActive = currentItems.find(i =>
+            (i.store || "Costco") === store &&
+            ["need", "got"].includes(i.status) &&
+            String(i.name || "").toLowerCase() === name.toLowerCase()
+          );
+
+          if (sameActive) {
+            const ok = confirm(`${name} is already on the current list for ${store}. Update quantity/price instead?`);
+            if (ok) {
+              const ref = doc(db, "groceryItems", sameActive.id);
+              await updateDoc(ref, {
+                quantity,
+                price,
+                status: "need"
+              });
+            } else {
+              return;
+            }
+          } else {
+            await addDoc(collection(db, "groceryItems"), {
+              name,
+              quantity,
+              price,
+              store,
+              status: "need",
+              createdBy: currentUser.email || currentUser.uid,
+              createdAt: serverTimestamp()
+            });
+          }
+        }
 
         selectedStore = store;
         closeAddModal();
@@ -1149,6 +1261,82 @@
       });
     }
 
+    function getSuggestionPool() {
+      const map = new Map();
+
+      currentItems.forEach(item => {
+        if (!item.name) return;
+        const key = `${item.name.toLowerCase()}__${item.store || "Costco"}`;
+        map.set(key, {
+          name: item.name,
+          quantity: item.quantity || 1,
+          price: item.price || "",
+          store: item.store || selectedStore,
+          source: item.status === "saved" ? "Saved" : item.status === "future" ? "Future" : "Current"
+        });
+      });
+
+      receipts.forEach(receipt => {
+        (receipt.items || []).forEach(item => {
+          if (!item.name) return;
+          const store = receipt.store || selectedStore;
+          const key = `${item.name.toLowerCase()}__${store}`;
+          if (!map.has(key)) {
+            map.set(key, {
+              name: item.name,
+              quantity: item.quantity || 1,
+              price: item.price || "",
+              store,
+              source: "History"
+            });
+          }
+        });
+      });
+
+      return Array.from(map.values());
+    }
+
+    function renderSuggestions() {
+      const text = itemNameInput.value.trim().toLowerCase();
+
+      if (!text || text.length < 2) {
+        suggestionsBox.classList.add("hidden");
+        suggestionsBox.innerHTML = "";
+        return;
+      }
+
+      const matches = getSuggestionPool()
+        .filter(item => item.name.toLowerCase().includes(text))
+        .slice(0, 6);
+
+      if (!matches.length) {
+        suggestionsBox.classList.add("hidden");
+        suggestionsBox.innerHTML = "";
+        return;
+      }
+
+      suggestionsBox.innerHTML = "";
+      matches.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "suggestion";
+        div.innerHTML = `
+          <strong>${escapeHtml(item.name)}</strong>
+          <span>${escapeHtml(item.store)} • ${item.price ? escapeHtml(item.price) : "no price"} • from ${escapeHtml(item.source)}</span>
+        `;
+        div.addEventListener("click", () => {
+          itemNameInput.value = item.name;
+          itemQtyInput.value = item.quantity || 1;
+          itemPriceInput.value = item.price || "";
+          itemStoreInput.value = item.store || selectedStore;
+          suggestionsBox.classList.add("hidden");
+        });
+        suggestionsBox.appendChild(div);
+      });
+
+      suggestionsBox.classList.remove("hidden");
+    }
+
+
     signInBtn.addEventListener("click", handleSignIn);
     createAccountBtn.addEventListener("click", handleCreateAccount);
     signOutBtn.addEventListener("click", handleSignOut);
@@ -1161,7 +1349,10 @@
     finishShoppingTopBtn.addEventListener("click", finishShopping);
 
     toggleSavedBtn.addEventListener("click", () => savedWrap.classList.toggle("hidden"));
+    toggleFutureBtn.addEventListener("click", () => futureWrap.classList.toggle("hidden"));
     toggleHistoryBtn.addEventListener("click", () => historyWrap.classList.toggle("hidden"));
+
+    itemNameInput.addEventListener("input", renderSuggestions);
 
     addModal.addEventListener("click", (e) => {
       if (e.target === addModal) closeAddModal();
