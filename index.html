@@ -326,6 +326,38 @@
       border-color:#7cc28e;
     }
 
+    .item-edit-row{
+      display:grid;
+      grid-template-columns:110px 1fr;
+      gap:8px;
+      margin-top:10px;
+      max-width:360px;
+    }
+
+    .mini-field label{
+      display:block;
+      font-size:10px;
+      font-weight:900;
+      color:var(--muted);
+      letter-spacing:.08em;
+      margin-bottom:4px;
+    }
+
+    .mini-field input{
+      width:100%;
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:9px 10px;
+      font-size:14px;
+      background:#fff;
+      outline:none;
+    }
+
+    .mini-field input:focus{
+      border-color:var(--blue);
+      box-shadow:0 0 0 3px rgba(47,115,183,.12);
+    }
+
     .item-actions{
       display:flex;
       gap:8px;
@@ -676,8 +708,8 @@
       </div>
 
       <div class="field">
-        <label for="itemPriceInput">PRICE</label>
-        <input id="itemPriceInput" type="text" placeholder="3.99 or 9.99/2" />
+        <label for="itemPriceInput">PRICE OPTIONAL</label>
+        <input id="itemPriceInput" type="text" placeholder="Optional now, can add in store" />
       </div>
 
       <div class="field">
@@ -1014,6 +1046,7 @@
       const total = itemTotal(item);
       const isSaved = item.status === "saved";
       const isFuture = item.status === "future";
+      const canEdit = !isSaved;
 
       let actions = "";
       if (isSaved) {
@@ -1038,6 +1071,19 @@
       const checkAction = item.status === "got" ? "need" : "got";
       const checkDisabled = isSaved || isFuture;
 
+      const editFields = canEdit ? `
+        <div class="item-edit-row">
+          <div class="mini-field">
+            <label>QTY</label>
+            <input class="inline-qty" type="number" min="1" value="${item.quantity || 1}" />
+          </div>
+          <div class="mini-field">
+            <label>PRICE</label>
+            <input class="inline-price" type="text" value="${escapeHtml(item.price || "")}" placeholder="Add price in store" />
+          </div>
+        </div>
+      ` : "";
+
       div.innerHTML = `
         <div class="item-top">
           <button class="check-btn ${item.status === "got" ? "checked" : ""}" ${checkDisabled ? "disabled" : ""} data-action="${checkAction}">
@@ -1046,14 +1092,42 @@
           <div class="item-main">
             <div class="item-name">${escapeHtml(item.name || "Untitled item")} × ${item.quantity || 1}</div>
             <div class="item-meta">
-              ${item.price ? `Price: ${escapeHtml(item.price)}` : "No price"}
+              ${item.price ? `Price: ${escapeHtml(item.price)}` : "Price not added yet"}
               ${total ? ` • Total: ${money(total)}` : ""}
               ${item.store ? ` • Store: ${escapeHtml(item.store)}` : ""}
             </div>
+            ${editFields}
           </div>
         </div>
         <div class="item-actions">${actions}</div>
       `;
+
+      const qtyInput = div.querySelector(".inline-qty");
+      const priceInput = div.querySelector(".inline-price");
+
+      async function saveInlineEdits() {
+        if (!qtyInput || !priceInput) return;
+
+        const quantity = parseInt(qtyInput.value, 10) || 1;
+        const price = priceInput.value.trim();
+
+        try {
+          const ref = doc(db, "groceryItems", item.id);
+          await updateDoc(ref, { quantity, price });
+        } catch (err) {
+          alert(err.message);
+          console.error(err);
+        }
+      }
+
+      qtyInput?.addEventListener("change", saveInlineEdits);
+      priceInput?.addEventListener("change", saveInlineEdits);
+      priceInput?.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          priceInput.blur();
+        }
+      });
 
       div.querySelectorAll("[data-action]").forEach(btn => {
         btn.addEventListener("click", async () => {
