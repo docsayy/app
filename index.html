@@ -36,7 +36,7 @@
     .wrap{
       max-width:900px;
       margin:0 auto;
-      padding:18px 16px 150px;
+      padding:18px 16px 165px;
       min-height:100vh;
     }
 
@@ -271,6 +271,13 @@
       border-radius:18px;
       padding:12px;
       background:#fbfdfe;
+      cursor:pointer;
+      transition:.15s ease;
+    }
+
+    .item:hover{
+      border-color:#b7ceda;
+      transform:translateY(-1px);
     }
 
     .item.checked{
@@ -345,36 +352,9 @@
       border-color:#7cc28e;
     }
 
-    .item-edit-row{
-      display:grid;
-      grid-template-columns:90px 1fr 1fr;
-      gap:8px;
-      margin-top:10px;
-      max-width:520px;
-    }
-
-    .mini-field label{
-      display:block;
-      font-size:10px;
-      font-weight:900;
-      color:var(--muted);
-      letter-spacing:.08em;
-      margin-bottom:4px;
-    }
-
-    .mini-field input{
-      width:100%;
-      border:1px solid var(--border);
-      border-radius:12px;
-      padding:9px 10px;
-      font-size:14px;
-      background:#fff;
-      outline:none;
-    }
-
-    .mini-field input:focus{
-      border-color:var(--blue);
-      box-shadow:0 0 0 3px rgba(47,115,183,.12);
+    .check-btn:disabled{
+      opacity:.45;
+      cursor:not-allowed;
     }
 
     .note-box{
@@ -394,70 +374,6 @@
       border-radius:14px;
       border:1px solid var(--border);
       display:block;
-    }
-
-    .item-actions{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      margin-top:12px;
-    }
-
-    .chip{
-      font-size:12px;
-      padding:8px 10px;
-      border-radius:999px;
-      border:1px solid var(--border);
-      background:#fff;
-      cursor:pointer;
-      font-weight:800;
-      color:var(--text);
-    }
-
-    .chip.saved{
-      background:#f8f1e8;
-      color:var(--orange);
-      border-color:#ead2b8;
-    }
-
-    .chip.delete{
-      background:#fff2f0;
-      color:var(--red);
-      border-color:#f0c2bc;
-    }
-
-    .chip.sale{
-      background:#fff4cf;
-      color:#7a4c00;
-      border-color:#e5bd4c;
-    }
-
-    .summary-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-      margin-bottom:14px;
-    }
-
-    .summary-box{
-      background:#fff;
-      border:1px solid var(--border);
-      border-radius:18px;
-      padding:12px;
-    }
-
-    .summary-label{
-      font-size:11px;
-      font-weight:900;
-      color:var(--muted);
-      letter-spacing:.1em;
-    }
-
-    .summary-value{
-      font-size:20px;
-      font-weight:900;
-      color:#7e173f;
-      margin-top:3px;
     }
 
     .history-item{
@@ -512,7 +428,7 @@
 
     .modal-card{
       width:100%;
-      max-width:500px;
+      max-width:560px;
       background:#fff;
       border-radius:24px;
       padding:22px;
@@ -533,6 +449,61 @@
       margin-top:8px;
     }
 
+    .edit-extra-actions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+      margin-top:10px;
+    }
+
+    .receipt-box{
+      background:#fbfdfe;
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:12px;
+      margin-bottom:14px;
+      font-size:14px;
+      line-height:1.5;
+    }
+
+    .receipt-row{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      border-bottom:1px dashed #d7e2e8;
+      padding:7px 0;
+    }
+
+    .receipt-row:last-child{
+      border-bottom:0;
+    }
+
+    .expense-store-row{
+      margin:10px 0;
+    }
+
+    .expense-line{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      font-size:14px;
+      font-weight:800;
+      margin-bottom:5px;
+    }
+
+    .expense-bar{
+      height:10px;
+      border-radius:999px;
+      background:#e8f1f5;
+      overflow:hidden;
+    }
+
+    .expense-fill{
+      height:100%;
+      background:var(--blue);
+      width:0%;
+    }
+
     .bottom-bar{
       position:fixed;
       left:0;
@@ -549,8 +520,14 @@
       max-width:900px;
       margin:0 auto;
       display:grid;
-      grid-template-columns:1fr auto auto;
+      grid-template-columns:1fr auto auto auto;
       gap:10px;
+      align-items:center;
+    }
+
+    .bottom-buttons{
+      display:flex;
+      gap:8px;
       align-items:center;
     }
 
@@ -605,19 +582,14 @@
       font-weight:700;
     }
 
-    .check-btn:disabled{
-      opacity:.45;
-      cursor:not-allowed;
-    }
-
     @media (max-width:700px){
       .wrap{
-        padding:12px 10px 185px;
+        padding:12px 10px 215px;
       }
 
       .auth-actions,
       .modal-actions,
-      .summary-grid{
+      .edit-extra-actions{
         grid-template-columns:1fr;
       }
 
@@ -635,11 +607,6 @@
         padding:9px 8px;
         font-size:13px;
         border-radius:13px;
-      }
-
-      .item-edit-row{
-        grid-template-columns:1fr;
-        max-width:100%;
       }
 
       .account-box{
@@ -680,21 +647,9 @@
         <div id="storeTabs" class="tabs"></div>
       </div>
 
-      <div class="summary-grid">
-        <div class="summary-box">
-          <div class="summary-label">MONTHLY SPENT</div>
-          <div id="monthlySpent" class="summary-value">$0.00</div>
-        </div>
-        <div class="summary-box">
-          <div class="summary-label">ANNUAL SPENT</div>
-          <div id="annualSpent" class="summary-value">$0.00</div>
-        </div>
-      </div>
-
       <div class="card panel">
         <div class="section-head">
           <div class="section-title">GET</div>
-          <button id="finishShoppingTopBtn" class="btn btn-green btn-small">Finish Shopping</button>
         </div>
         <div id="needList" class="list"></div>
       </div>
@@ -753,17 +708,18 @@
   <div id="bottomBar" class="bottom-bar hidden">
     <div class="bottom-inner">
       <div class="total-box">
-        <div class="total-label">PICKED TOTAL</div>
+        <div class="total-label">ROUGH RECEIPT TOTAL</div>
         <div id="pickedTotalBottom" class="total-value">$0.00</div>
       </div>
-      <button id="bottomAddBtn" class="btn btn-green">+ Add Item</button>
-      <button id="finishShoppingBtn" class="btn btn-primary">Finish Shopping</button>
+      <button id="bottomAddBtn" class="btn btn-green">+ Add</button>
+      <button id="expenseBtn" class="btn btn-ghost">Expense</button>
+      <button id="finishShoppingBtn" class="btn btn-primary">Finish</button>
     </div>
   </div>
 
   <div id="addModal" class="modal hidden">
     <div class="modal-card">
-      <h2>Add Item</h2>
+      <h2 id="itemModalTitle">Add Item</h2>
 
       <div class="field">
         <label for="itemNameInput">ITEM NAME</label>
@@ -803,9 +759,54 @@
 
       <button id="saleToggleBtn" type="button" class="sale-toggle">Sale: Off</button>
 
+      <div id="editExtraActions" class="edit-extra-actions hidden">
+        <button id="moveNeedBtn" type="button" class="btn btn-ghost btn-small">Move to Get</button>
+        <button id="moveFutureBtn" type="button" class="btn btn-ghost btn-small">Move to Future</button>
+        <button id="moveSavedBtn" type="button" class="btn btn-ghost btn-small">Move to Saved</button>
+        <button id="deleteItemBtn" type="button" class="btn btn-danger btn-small">Delete Item</button>
+      </div>
+
       <div class="modal-actions">
         <button id="saveModalItemBtn" class="btn btn-green">Save Item</button>
         <button id="closeModalBtn" class="btn btn-ghost">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="expenseModal" class="modal hidden">
+    <div class="modal-card">
+      <h2>Expense</h2>
+      <div id="expenseContent"></div>
+      <div class="modal-actions">
+        <button id="closeExpenseBtn" class="btn btn-primary">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="finishModal" class="modal hidden">
+    <div class="modal-card">
+      <h2>Finish Shopping</h2>
+
+      <div id="finishReceiptPreview" class="receipt-box"></div>
+
+      <div class="field">
+        <label for="actualTotalInput">ACTUAL CHECKOUT TOTAL OPTIONAL</label>
+        <input id="actualTotalInput" type="number" step="0.01" placeholder="Enter total from store receipt" />
+      </div>
+
+      <div class="field">
+        <label for="receiptFileInput">ATTACH REAL RECEIPT PHOTO / PDF OPTIONAL</label>
+        <input id="receiptFileInput" type="file" accept="image/*,.pdf" />
+      </div>
+
+      <div class="field">
+        <label for="receiptNoteInput">RECEIPT NOTE OPTIONAL</label>
+        <textarea id="receiptNoteInput" placeholder="Anything to remember about this trip..."></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button id="saveReceiptBtn" class="btn btn-green">Save Receipt</button>
+        <button id="closeFinishBtn" class="btn btn-ghost">Cancel</button>
       </div>
     </div>
   </div>
@@ -834,6 +835,13 @@
       writeBatch
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
+    import {
+      getStorage,
+      ref as storageRef,
+      uploadBytes,
+      getDownloadURL
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
     const firebaseConfig = {
       apiKey: "AIzaSyCKjRp3Cznv-kpLmV_jTMWPLbxholG8_t0",
       authDomain: "grocery-tracker-ac17b.firebaseapp.com",
@@ -846,6 +854,7 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const db = getFirestore(app);
+    const storage = getStorage(app);
 
     const DEFAULT_STORES = ["Costco", "ShopRite"];
 
@@ -881,14 +890,13 @@
     const futureCount = document.getElementById("futureCount");
     const gotCount = document.getElementById("gotCount");
     const pickedTotalBottom = document.getElementById("pickedTotalBottom");
-    const monthlySpent = document.getElementById("monthlySpent");
-    const annualSpent = document.getElementById("annualSpent");
 
     const bottomAddBtn = document.getElementById("bottomAddBtn");
+    const expenseBtn = document.getElementById("expenseBtn");
     const finishShoppingBtn = document.getElementById("finishShoppingBtn");
-    const finishShoppingTopBtn = document.getElementById("finishShoppingTopBtn");
 
     const addModal = document.getElementById("addModal");
+    const itemModalTitle = document.getElementById("itemModalTitle");
     const itemNameInput = document.getElementById("itemNameInput");
     const itemQtyInput = document.getElementById("itemQtyInput");
     const itemSizeInput = document.getElementById("itemSizeInput");
@@ -900,6 +908,23 @@
     const suggestionsBox = document.getElementById("suggestionsBox");
     const saveModalItemBtn = document.getElementById("saveModalItemBtn");
     const closeModalBtn = document.getElementById("closeModalBtn");
+    const editExtraActions = document.getElementById("editExtraActions");
+    const moveNeedBtn = document.getElementById("moveNeedBtn");
+    const moveFutureBtn = document.getElementById("moveFutureBtn");
+    const moveSavedBtn = document.getElementById("moveSavedBtn");
+    const deleteItemBtn = document.getElementById("deleteItemBtn");
+
+    const expenseModal = document.getElementById("expenseModal");
+    const expenseContent = document.getElementById("expenseContent");
+    const closeExpenseBtn = document.getElementById("closeExpenseBtn");
+
+    const finishModal = document.getElementById("finishModal");
+    const finishReceiptPreview = document.getElementById("finishReceiptPreview");
+    const actualTotalInput = document.getElementById("actualTotalInput");
+    const receiptFileInput = document.getElementById("receiptFileInput");
+    const receiptNoteInput = document.getElementById("receiptNoteInput");
+    const saveReceiptBtn = document.getElementById("saveReceiptBtn");
+    const closeFinishBtn = document.getElementById("closeFinishBtn");
 
     let currentUser = null;
     let currentItems = [];
@@ -977,6 +1002,10 @@
 
     function openAddModal(sourceItem = null){
       editingItemId = sourceItem?.id || null;
+      itemModalTitle.textContent = editingItemId ? "Edit Item" : "Add Item";
+      saveModalItemBtn.textContent = editingItemId ? "Save Changes" : "Save Item";
+      editExtraActions.classList.toggle("hidden", !editingItemId);
+
       itemNameInput.value = sourceItem?.name || "";
       itemQtyInput.value = sourceItem?.quantity || "1";
       itemSizeInput.value = sourceItem?.size || "";
@@ -995,6 +1024,7 @@
       addModal.classList.add("hidden");
       editingItemId = null;
       suggestionsBox.classList.add("hidden");
+      editExtraActions.classList.add("hidden");
     }
 
     async function handleSignIn(){
@@ -1098,7 +1128,6 @@
       renderStoreTabs();
       renderItems();
       renderHistory();
-      renderExpenses();
     }
 
     function renderItems(){
@@ -1152,53 +1181,8 @@
       const total = itemTotal(item);
       const isSaved = item.status === "saved";
       const isFuture = item.status === "future";
-      const canEdit = !isSaved;
-
-      let actions = "";
-
-      if(isSaved){
-        actions = `
-          <button class="chip" data-action="addSaved">Add to List</button>
-          <button class="chip delete" data-action="delete">Delete</button>
-        `;
-      }else if(isFuture){
-        actions = `
-          <button class="chip" data-action="need">Add to Get</button>
-          <button class="chip saved" data-action="saved">Move to Saved</button>
-          <button class="chip delete" data-action="delete">Delete</button>
-        `;
-      }else{
-        actions = `
-          <button class="chip sale" data-action="toggleSale">${item.sale ? "Sale On" : "Sale"}</button>
-          <button class="chip saved" data-action="saved">Save for Later</button>
-          <button class="chip" data-action="future">Future List</button>
-          <button class="chip delete" data-action="delete">Delete</button>
-        `;
-      }
-
-      if(item.photoUrl){
-        actions = `<button class="chip" data-action="togglePhoto">Photo</button>` + actions;
-      }
-
       const checkAction = item.status === "got" ? "need" : "got";
       const checkDisabled = isSaved || isFuture;
-
-      const editFields = canEdit ? `
-        <div class="item-edit-row">
-          <div class="mini-field">
-            <label>QTY</label>
-            <input class="inline-qty" type="number" min="1" value="${item.quantity || 1}" />
-          </div>
-          <div class="mini-field">
-            <label>SIZE</label>
-            <input class="inline-size" type="text" value="${escapeHtml(item.size || "")}" placeholder="Size" />
-          </div>
-          <div class="mini-field">
-            <label>PRICE</label>
-            <input class="inline-price" type="text" value="${escapeHtml(item.price || "")}" placeholder="Add price" />
-          </div>
-        </div>
-      ` : "";
 
       div.innerHTML = `
         <div class="item-top">
@@ -1215,79 +1199,57 @@
 
             <div class="item-meta">
               ${item.price ? `Price: ${escapeHtml(item.price)}` : "Price not added yet"}
-              ${total ? ` • Total: ${money(total)}` : ""}
-              ${item.store ? ` • Store: ${escapeHtml(item.store)}` : ""}
+              ${total ? ` • Rough total: ${money(total)}` : ""}
+              ${item.store ? ` • ${escapeHtml(item.store)}` : ""}
             </div>
 
             ${item.note ? `<div class="note-box">${escapeHtml(item.note)}</div>` : ""}
-            ${editFields}
-            ${item.photoUrl ? `<img class="photo-preview hidden" src="${escapeHtml(item.photoUrl)}" alt="Item reference photo" />` : ""}
+            ${item.photoUrl ? `<img class="photo-preview" src="${escapeHtml(item.photoUrl)}" alt="Item reference photo" />` : ""}
           </div>
         </div>
-
-        <div class="item-actions">${actions}</div>
       `;
 
-      const qtyInput = div.querySelector(".inline-qty");
-      const sizeInput = div.querySelector(".inline-size");
-      const priceInput = div.querySelector(".inline-price");
+      div.addEventListener("click", () => openAddModal(item));
 
-      async function saveInlineEdits(){
-        if(!qtyInput || !priceInput || !sizeInput) return;
-
-        const quantity = parseInt(qtyInput.value,10) || 1;
-        const price = priceInput.value.trim();
-        const size = sizeInput.value.trim();
+      div.querySelector("[data-action]")?.addEventListener("click", async e => {
+        e.stopPropagation();
+        const action = e.currentTarget.dataset.action;
+        const ref = doc(db,"groceryItems",item.id);
 
         try{
-          const ref = doc(db,"groceryItems",item.id);
-          await updateDoc(ref,{ quantity, price, size });
+          await updateDoc(ref,{ status: action });
         }catch(err){
           alert(err.message);
           console.error(err);
         }
-      }
-
-      qtyInput?.addEventListener("change",saveInlineEdits);
-      sizeInput?.addEventListener("change",saveInlineEdits);
-      priceInput?.addEventListener("change",saveInlineEdits);
-
-      [qtyInput,sizeInput,priceInput].forEach(input => {
-        input?.addEventListener("keydown", e => {
-          if(e.key === "Enter"){
-            e.preventDefault();
-            input.blur();
-          }
-        });
-      });
-
-      div.querySelectorAll("[data-action]").forEach(btn => {
-        btn.addEventListener("click", async () => {
-          const action = btn.dataset.action;
-          const ref = doc(db,"groceryItems",item.id);
-
-          try{
-            if(action === "delete"){
-              if(!confirm(`Delete ${item.name}?`)) return;
-              await deleteDoc(ref);
-            }else if(action === "addSaved"){
-              openAddModal(item);
-            }else if(action === "toggleSale"){
-              await updateDoc(ref,{ sale: !item.sale });
-            }else if(action === "togglePhoto"){
-              const img = div.querySelector(".photo-preview");
-              img?.classList.toggle("hidden");
-            }else{
-              await updateDoc(ref,{ status: action });
-            }
-          }catch(err){
-            alert(err.message);
-            console.error(err);
-          }
-        });
       });
 
       return div;
+    }
+
+    async function updateEditingItemStatus(status){
+      if(!editingItemId) return;
+      try{
+        await updateDoc(doc(db,"groceryItems",editingItemId),{ status });
+        closeAddModal();
+      }catch(err){
+        alert(err.message);
+        console.error(err);
+      }
+    }
+
+    async function deleteEditingItem(){
+      if(!editingItemId) return;
+      const item = currentItems.find(i => i.id === editingItemId);
+      if(!confirm(`Delete ${item?.name || "this item"}?`)) return;
+
+      try{
+        await deleteDoc(doc(db,"groceryItems",editingItemId));
+        closeAddModal();
+      }catch(err){
+        alert(err.message);
+        console.error(err);
+      }
     }
 
     async function handleAddItem(){
@@ -1321,8 +1283,7 @@
             note,
             photoUrl,
             sale: modalSale,
-            store,
-            status:"need"
+            store
           });
         }else{
           const sameActive = currentItems.find(i =>
@@ -1373,30 +1334,102 @@
       }
     }
 
-    async function finishShopping(){
+    function getPickedItems(){
+      return currentItems.filter(i => (i.store || "Costco") === selectedStore && i.status === "got");
+    }
+
+    function buildEstimatedReceiptHtml(gotItems){
+      const total = gotItems.reduce((sum,item) => sum + itemTotal(item),0);
+
+      const rows = gotItems.map(item => `
+        <div class="receipt-row">
+          <div>
+            <b>${escapeHtml(item.name || "")}</b>
+            <div style="color:var(--muted);font-size:12px;">
+              Qty ${item.quantity || 1}${item.size ? ` • ${escapeHtml(item.size)}` : ""}${item.sale ? " • SALE" : ""}
+            </div>
+          </div>
+          <div>${money(itemTotal(item))}</div>
+        </div>
+      `).join("");
+
+      return `
+        <div style="font-weight:900;margin-bottom:8px;">Estimated in-app receipt for ${escapeHtml(selectedStore)}</div>
+        ${rows}
+        <div class="receipt-row" style="font-weight:900;font-size:16px;margin-top:8px;">
+          <div>Rough estimated total</div>
+          <div>${money(total)}</div>
+        </div>
+      `;
+    }
+
+    function openFinishModal(){
       if(!currentUser){
         alert("Please sign in first.");
         return;
       }
 
-      const gotItems = currentItems.filter(i => (i.store || "Costco") === selectedStore && i.status === "got");
+      const gotItems = getPickedItems();
 
       if(!gotItems.length){
         alert("No checked items to save for this store.");
         return;
       }
 
-      const total = gotItems.reduce((sum,item) => sum + itemTotal(item),0);
-      const count = totalQuantity(gotItems);
+      finishReceiptPreview.innerHTML = buildEstimatedReceiptHtml(gotItems);
+      actualTotalInput.value = "";
+      receiptFileInput.value = "";
+      receiptNoteInput.value = "";
+      finishModal.classList.remove("hidden");
+    }
 
-      const ok = confirm(`Save receipt for ${selectedStore} with ${count} total item(s), total ${money(total)}?`);
-      if(!ok) return;
+    async function saveReceipt(){
+      if(!currentUser){
+        alert("Please sign in first.");
+        return;
+      }
+
+      const gotItems = getPickedItems();
+
+      if(!gotItems.length){
+        alert("No checked items to save for this store.");
+        return;
+      }
+
+      const estimatedTotal = gotItems.reduce((sum,item) => sum + itemTotal(item),0);
+      const actualTotal = actualTotalInput.value ? Number(actualTotalInput.value) : null;
+      const count = totalQuantity(gotItems);
+      const note = receiptNoteInput.value.trim();
+      const file = receiptFileInput.files?.[0] || null;
+
+      saveReceiptBtn.disabled = true;
+      saveReceiptBtn.textContent = "Saving...";
 
       try{
+        let receiptFileUrl = "";
+        let receiptFileName = "";
+        let receiptFileType = "";
+
+        if(file){
+          receiptFileName = file.name;
+          receiptFileType = file.type || "unknown";
+          const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g,"_");
+          const path = `receipts/${currentUser.uid}/${Date.now()}_${safeName}`;
+          const fileRef = storageRef(storage,path);
+          await uploadBytes(fileRef,file);
+          receiptFileUrl = await getDownloadURL(fileRef);
+        }
+
         await addDoc(collection(db,"receipts"),{
           store:selectedStore,
-          total,
+          estimatedTotal,
+          actualTotal,
+          total: actualTotal ?? estimatedTotal,
           itemCount:count,
+          note,
+          receiptFileUrl,
+          receiptFileName,
+          receiptFileType,
           items:gotItems.map(item => ({
             name:item.name || "",
             quantity:item.quantity || 1,
@@ -1418,10 +1451,14 @@
         });
         await batch.commit();
 
-        alert("Shopping receipt saved. Picked items moved to Saved.");
+        finishModal.classList.add("hidden");
+        alert("Receipt saved. Picked items moved to Saved.");
       }catch(err){
         alert(err.message);
         console.error(err);
+      }finally{
+        saveReceiptBtn.disabled = false;
+        saveReceiptBtn.textContent = "Save Receipt";
       }
     }
 
@@ -1431,28 +1468,71 @@
       return null;
     }
 
-    function renderExpenses(){
+    function openExpenseModal(){
       const now = new Date();
       const month = now.getMonth();
       const year = now.getFullYear();
 
       let monthly = 0;
       let annual = 0;
+      const storeTotals = {};
 
       receipts.forEach(receipt => {
         const date = getReceiptDate(receipt);
         if(!date || isNaN(date)) return;
 
+        const total = Number(receipt.total ?? receipt.actualTotal ?? receipt.estimatedTotal ?? 0);
+        const store = receipt.store || "Unknown";
+
         if(date.getFullYear() === year){
-          annual += Number(receipt.total || 0);
+          annual += total;
+
           if(date.getMonth() === month){
-            monthly += Number(receipt.total || 0);
+            monthly += total;
+            storeTotals[store] = (storeTotals[store] || 0) + total;
           }
         }
       });
 
-      monthlySpent.textContent = money(monthly);
-      annualSpent.textContent = money(annual);
+      const storeRows = Object.entries(storeTotals)
+        .sort((a,b) => b[1] - a[1])
+        .map(([store,total]) => {
+          const percent = monthly ? (total / monthly) * 100 : 0;
+          return `
+            <div class="expense-store-row">
+              <div class="expense-line">
+                <span>${escapeHtml(store)}</span>
+                <span>${money(total)} • ${percent.toFixed(1)}%</span>
+              </div>
+              <div class="expense-bar">
+                <div class="expense-fill" style="width:${Math.max(0,Math.min(100,percent))}%"></div>
+              </div>
+            </div>
+          `;
+        })
+        .join("");
+
+      expenseContent.innerHTML = `
+        <div class="receipt-box">
+          <div class="receipt-row">
+            <div><b>This month</b></div>
+            <div>${money(monthly)}</div>
+          </div>
+          <div class="receipt-row">
+            <div><b>This year</b></div>
+            <div>${money(annual)}</div>
+          </div>
+          <div class="receipt-row">
+            <div><b>Annual estimate</b></div>
+            <div>${money(monthly * 12)}</div>
+          </div>
+        </div>
+
+        <div style="font-weight:900;margin-bottom:8px;">Monthly spending by store</div>
+        ${storeRows || `<div class="empty">No receipts saved this month yet.</div>`}
+      `;
+
+      expenseModal.classList.remove("hidden");
     }
 
     function renderHistory(){
@@ -1483,25 +1563,36 @@
           })
           .join("<br>");
 
+        const actualLine = receipt.actualTotal != null ? `<div>Actual checkout total: <b>${money(receipt.actualTotal)}</b></div>` : "";
+        const estimatedLine = receipt.estimatedTotal != null ? `<div>Estimated total: <b>${money(receipt.estimatedTotal)}</b></div>` : "";
+        const fileLine = receipt.receiptFileUrl ? `<div style="margin-top:8px;"><a href="${escapeHtml(receipt.receiptFileUrl)}" target="_blank" rel="noopener">Open attached receipt</a></div>` : "";
+        const noteLine = receipt.note ? `<div class="note-box">${escapeHtml(receipt.note)}</div>` : "";
+
         div.innerHTML = `
           <div class="history-top">
             <div>${escapeHtml(receipt.store || selectedStore)}</div>
-            <div>${money(receipt.total || 0)}</div>
+            <div>${money(receipt.total || receipt.actualTotal || receipt.estimatedTotal || 0)}</div>
           </div>
 
           <div class="history-meta">
             ${dateText} • ${receipt.itemCount || totalQuantity(receipt.items || [])} item(s)
           </div>
 
-          <div class="history-details">${itemLines || "No item details."}</div>
+          <div class="history-details">
+            ${estimatedLine}
+            ${actualLine}
+            <div style="margin-top:8px;">${itemLines || "No item details."}</div>
+            ${fileLine}
+            ${noteLine}
+          </div>
 
-          <div class="item-actions">
-            <button class="chip delete" data-action="deleteReceipt">Delete Receipt</button>
+          <div style="margin-top:10px;">
+            <button class="btn btn-danger btn-small" data-action="deleteReceipt">Delete Receipt</button>
           </div>
         `;
 
         div.querySelector("[data-action='deleteReceipt']").addEventListener("click", async () => {
-          const ok = confirm(`Delete this ${receipt.store || selectedStore} receipt for ${money(receipt.total || 0)}?`);
+          const ok = confirm(`Delete this ${receipt.store || selectedStore} receipt for ${money(receipt.total || receipt.actualTotal || receipt.estimatedTotal || 0)}?`);
           if(!ok) return;
 
           try{
@@ -1590,6 +1681,12 @@
     }
 
     function renderSuggestions(){
+      if(editingItemId){
+        suggestionsBox.classList.add("hidden");
+        suggestionsBox.innerHTML = "";
+        return;
+      }
+
       const text = itemNameInput.value.trim().toLowerCase();
 
       if(!text || text.length < 2){
@@ -1650,8 +1747,17 @@
     saveModalItemBtn.addEventListener("click",handleAddItem);
     closeModalBtn.addEventListener("click",closeAddModal);
 
-    finishShoppingBtn.addEventListener("click",finishShopping);
-    finishShoppingTopBtn.addEventListener("click",finishShopping);
+    expenseBtn.addEventListener("click",openExpenseModal);
+    closeExpenseBtn.addEventListener("click",() => expenseModal.classList.add("hidden"));
+
+    finishShoppingBtn.addEventListener("click",openFinishModal);
+    closeFinishBtn.addEventListener("click",() => finishModal.classList.add("hidden"));
+    saveReceiptBtn.addEventListener("click",saveReceipt);
+
+    moveNeedBtn.addEventListener("click",() => updateEditingItemStatus("need"));
+    moveFutureBtn.addEventListener("click",() => updateEditingItemStatus("future"));
+    moveSavedBtn.addEventListener("click",() => updateEditingItemStatus("saved"));
+    deleteItemBtn.addEventListener("click",deleteEditingItem);
 
     toggleSavedBtn.addEventListener("click",() => savedWrap.classList.toggle("hidden"));
     toggleFutureBtn.addEventListener("click",() => futureWrap.classList.toggle("hidden"));
@@ -1668,15 +1774,23 @@
       if(e.target === addModal) closeAddModal();
     });
 
+    expenseModal.addEventListener("click", e => {
+      if(e.target === expenseModal) expenseModal.classList.add("hidden");
+    });
+
+    finishModal.addEventListener("click", e => {
+      if(e.target === finishModal) finishModal.classList.add("hidden");
+    });
+
     [emailInput,passwordInput].forEach(el => {
       el.addEventListener("keydown", e => {
         if(e.key === "Enter") handleSignIn();
       });
     });
 
-    [itemNameInput,itemQtyInput,itemSizeInput,itemPriceInput,itemNoteInput,itemPhotoInput].forEach(el => {
+    [itemNameInput,itemQtyInput,itemSizeInput,itemPriceInput,itemPhotoInput].forEach(el => {
       el.addEventListener("keydown", e => {
-        if(e.key === "Enter" && el.tagName !== "TEXTAREA"){
+        if(e.key === "Enter"){
           handleAddItem();
         }
       });
