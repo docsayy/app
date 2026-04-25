@@ -4,6 +4,7 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Grocery App</title>
+
   <style>
     :root{
       --bg:#eef5f7;
@@ -17,6 +18,8 @@
       --green-dark:#23863f;
       --red:#b42318;
       --orange:#a15c12;
+      --sale:#ffb703;
+      --highlight:#fff3bf;
       --shadow:0 12px 30px rgba(35,55,80,.08);
       --radius:24px;
     }
@@ -33,7 +36,7 @@
     .wrap{
       max-width:900px;
       margin:0 auto;
-      padding:18px 16px 130px;
+      padding:18px 16px 150px;
       min-height:100vh;
     }
 
@@ -56,7 +59,6 @@
       margin:0 0 8px;
       text-align:center;
       letter-spacing:.08em;
-      color:var(--text);
     }
 
     .auth-sub{
@@ -66,9 +68,7 @@
       font-size:14px;
     }
 
-    .field{
-      margin-bottom:14px;
-    }
+    .field{margin-bottom:14px}
 
     .field label{
       display:block;
@@ -80,18 +80,26 @@
     }
 
     .field input,
-    .field select{
+    .field select,
+    .field textarea{
       width:100%;
-      padding:14px 14px;
+      padding:14px;
       border-radius:14px;
       border:2px solid #cfdbe3;
       outline:none;
       font-size:16px;
       background:#fff;
+      font-family:inherit;
+    }
+
+    .field textarea{
+      min-height:80px;
+      resize:vertical;
     }
 
     .field input:focus,
-    .field select:focus{
+    .field select:focus,
+    .field textarea:focus{
       border-color:var(--blue);
       box-shadow:0 0 0 4px rgba(47,115,183,.12);
     }
@@ -122,18 +130,10 @@
       cursor:not-allowed;
     }
 
-    .btn-primary{
-      background:var(--blue);
-      color:#fff;
-    }
-
+    .btn-primary{background:var(--blue);color:#fff}
     .btn-primary:hover{background:var(--blue-dark)}
 
-    .btn-green{
-      background:var(--green);
-      color:#fff;
-    }
-
+    .btn-green{background:var(--green);color:#fff}
     .btn-green:hover{background:var(--green-dark)}
 
     .btn-ghost{
@@ -154,6 +154,23 @@
       font-size:13px;
     }
 
+    .sale-toggle{
+      border:1px solid #e2b13c;
+      background:#fff8db;
+      color:#8a5a00;
+      border-radius:999px;
+      padding:8px 12px;
+      font-weight:900;
+      cursor:pointer;
+      width:max-content;
+    }
+
+    .sale-toggle.active{
+      background:var(--sale);
+      color:#3b2600;
+      border-color:#d99500;
+    }
+
     .auth-actions{
       display:grid;
       grid-template-columns:1fr 1fr;
@@ -170,28 +187,6 @@
     }
 
     #appShell{display:none}
-
-    .topbar{
-      display:flex;
-      gap:12px;
-      align-items:center;
-      justify-content:space-between;
-      margin-bottom:14px;
-    }
-
-    .status-pill{
-      flex:1;
-      background:#fff;
-      border:1px solid var(--border);
-      border-radius:18px;
-      padding:14px 16px;
-      color:var(--muted);
-      box-shadow:var(--shadow);
-      min-height:52px;
-      display:flex;
-      align-items:center;
-      font-size:14px;
-    }
 
     .header-card{
       padding:10px;
@@ -283,6 +278,11 @@
       border-color:#b8dec3;
     }
 
+    .item.sale-item{
+      border-color:#e2b13c;
+      background:#fffaf0;
+    }
+
     .item-top{
       display:grid;
       grid-template-columns:46px 1fr;
@@ -290,9 +290,7 @@
       align-items:start;
     }
 
-    .item-main{
-      min-width:0;
-    }
+    .item-main{min-width:0}
 
     .item-name{
       font-weight:900;
@@ -305,6 +303,27 @@
       font-size:13px;
       margin-top:4px;
       line-height:1.45;
+    }
+
+    .badge{
+      display:inline-block;
+      font-size:11px;
+      font-weight:900;
+      border-radius:999px;
+      padding:4px 8px;
+      margin-left:5px;
+      background:#eef4f7;
+      color:var(--muted);
+    }
+
+    .badge.sale{
+      background:#ffd166;
+      color:#5f3d00;
+    }
+
+    .badge.size{
+      background:#e8f1fb;
+      color:#245f98;
     }
 
     .check-btn{
@@ -328,10 +347,10 @@
 
     .item-edit-row{
       display:grid;
-      grid-template-columns:110px 1fr;
+      grid-template-columns:90px 1fr 1fr;
       gap:8px;
       margin-top:10px;
-      max-width:360px;
+      max-width:520px;
     }
 
     .mini-field label{
@@ -356,6 +375,25 @@
     .mini-field input:focus{
       border-color:var(--blue);
       box-shadow:0 0 0 3px rgba(47,115,183,.12);
+    }
+
+    .note-box{
+      margin-top:8px;
+      font-size:13px;
+      background:#f7fbfd;
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:8px 10px;
+      color:var(--text);
+      line-height:1.4;
+    }
+
+    .photo-preview{
+      margin-top:10px;
+      max-width:180px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      display:block;
     }
 
     .item-actions{
@@ -386,6 +424,12 @@
       background:#fff2f0;
       color:var(--red);
       border-color:#f0c2bc;
+    }
+
+    .chip.sale{
+      background:#fff4cf;
+      color:#7a4c00;
+      border-color:#e5bd4c;
     }
 
     .summary-grid{
@@ -452,6 +496,7 @@
       align-items:center;
       gap:10px;
       flex-wrap:wrap;
+      margin-bottom:20px;
     }
 
     .modal{
@@ -467,7 +512,7 @@
 
     .modal-card{
       width:100%;
-      max-width:460px;
+      max-width:500px;
       background:#fff;
       border-radius:24px;
       padding:22px;
@@ -479,7 +524,6 @@
     .modal-card h2{
       margin:0 0 18px;
       text-align:center;
-      color:var(--text);
     }
 
     .modal-actions{
@@ -497,7 +541,7 @@
       background:rgba(238,245,247,.96);
       backdrop-filter:blur(10px);
       border-top:1px solid var(--border);
-      padding:12px 14px;
+      padding:10px 14px;
       z-index:20;
     }
 
@@ -531,33 +575,34 @@
       color:#7e173f;
     }
 
-
     .suggestions{
       margin-top:8px;
-      border:1px solid var(--border);
+      border:3px solid #ffb703;
       border-radius:14px;
       overflow:hidden;
-      background:#fff;
+      background:#fff8d6;
+      box-shadow:0 10px 25px rgba(180,120,0,.18);
     }
 
     .suggestion{
-      padding:11px 12px;
+      padding:12px;
       cursor:pointer;
-      border-bottom:1px solid var(--border);
+      border-bottom:1px solid #e5c560;
       font-size:14px;
+      background:#fff8d6;
     }
 
     .suggestion:last-child{border-bottom:0}
+    .suggestion:hover{background:#ffe08a}
 
-    .suggestion:hover{background:#f4f8fa}
-
-    .suggestion strong{color:var(--text)}
+    .suggestion strong{color:#5f3d00}
 
     .suggestion span{
       display:block;
       margin-top:3px;
-      color:var(--muted);
+      color:#795700;
       font-size:12px;
+      font-weight:700;
     }
 
     .check-btn:disabled{
@@ -566,6 +611,10 @@
     }
 
     @media (max-width:700px){
+      .wrap{
+        padding:12px 10px 185px;
+      }
+
       .auth-actions,
       .modal-actions,
       .summary-grid{
@@ -573,11 +622,33 @@
       }
 
       .bottom-inner{
+        grid-template-columns:1fr 1fr;
+        gap:8px;
+      }
+
+      .total-box{
+        grid-column:1 / -1;
+        padding:8px 12px;
+      }
+
+      .bottom-inner .btn{
+        padding:9px 8px;
+        font-size:13px;
+        border-radius:13px;
+      }
+
+      .item-edit-row{
         grid-template-columns:1fr;
+        max-width:100%;
+      }
+
+      .account-box{
+        margin-bottom:35px;
       }
     }
   </style>
 </head>
+
 <body>
   <div class="wrap">
     <div id="authScreen" class="card auth-card">
@@ -601,9 +672,7 @@
         <button id="createAccountBtn" class="btn btn-ghost">Create Account</button>
       </div>
 
-      <p class="auth-note">
-        First time? Use <b>Create Account</b> once, then later use <b>Sign In</b>.
-      </p>
+      <p class="auth-note">First time? Use <b>Create Account</b> once, then later use <b>Sign In</b>.</p>
     </div>
 
     <div id="appShell">
@@ -613,18 +682,18 @@
 
       <div class="summary-grid">
         <div class="summary-box">
-          <div class="summary-label">CURRENT STORE</div>
-          <div id="currentStoreLabel" class="summary-value">Costco</div>
+          <div class="summary-label">MONTHLY SPENT</div>
+          <div id="monthlySpent" class="summary-value">$0.00</div>
         </div>
         <div class="summary-box">
-          <div class="summary-label">PICKED TOTAL</div>
-          <div id="pickedTotal" class="summary-value">$0.00</div>
+          <div class="summary-label">ANNUAL SPENT</div>
+          <div id="annualSpent" class="summary-value">$0.00</div>
         </div>
       </div>
 
       <div class="card panel">
         <div class="section-head">
-          <div class="section-title">HAVE TO GET</div>
+          <div class="section-title">GET</div>
           <button id="finishShoppingTopBtn" class="btn btn-green btn-small">Finish Shopping</button>
         </div>
         <div id="needList" class="list"></div>
@@ -708,14 +777,31 @@
       </div>
 
       <div class="field">
+        <label for="itemSizeInput">SIZE</label>
+        <input id="itemSizeInput" type="text" placeholder="Small, large, 12 oz, 1 gallon..." />
+      </div>
+
+      <div class="field">
         <label for="itemPriceInput">PRICE OPTIONAL</label>
-        <input id="itemPriceInput" type="text" placeholder="Optional now, can add in store" />
+        <input id="itemPriceInput" type="text" placeholder="Optional now, example: 9.99 or 9.99 for 2" />
+      </div>
+
+      <div class="field">
+        <label for="itemNoteInput">FREE TEXT / NOTE</label>
+        <textarea id="itemNoteInput" placeholder="Any reminder, brand, flavor, aisle, etc."></textarea>
+      </div>
+
+      <div class="field">
+        <label for="itemPhotoInput">PHOTO REFERENCE URL OPTIONAL</label>
+        <input id="itemPhotoInput" type="text" placeholder="Paste image URL if needed" />
       </div>
 
       <div class="field">
         <label for="itemStoreInput">STORE</label>
         <select id="itemStoreInput"></select>
       </div>
+
+      <button id="saleToggleBtn" type="button" class="sale-toggle">Sale: Off</button>
 
       <div class="modal-actions">
         <button id="saveModalItemBtn" class="btn btn-green">Save Item</button>
@@ -733,6 +819,7 @@
       createUserWithEmailAndPassword,
       signOut
     } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
     import {
       getFirestore,
       collection,
@@ -775,7 +862,6 @@
     const signOutBtn = document.getElementById("signOutBtn");
 
     const storeTabs = document.getElementById("storeTabs");
-    const currentStoreLabel = document.getElementById("currentStoreLabel");
 
     const needList = document.getElementById("needList");
     const gotList = document.getElementById("gotList");
@@ -786,6 +872,7 @@
     const savedWrap = document.getElementById("savedWrap");
     const futureWrap = document.getElementById("futureWrap");
     const historyWrap = document.getElementById("historyWrap");
+
     const toggleSavedBtn = document.getElementById("toggleSavedBtn");
     const toggleFutureBtn = document.getElementById("toggleFutureBtn");
     const toggleHistoryBtn = document.getElementById("toggleHistoryBtn");
@@ -793,8 +880,9 @@
     const savedCount = document.getElementById("savedCount");
     const futureCount = document.getElementById("futureCount");
     const gotCount = document.getElementById("gotCount");
-    const pickedTotal = document.getElementById("pickedTotal");
     const pickedTotalBottom = document.getElementById("pickedTotalBottom");
+    const monthlySpent = document.getElementById("monthlySpent");
+    const annualSpent = document.getElementById("annualSpent");
 
     const bottomAddBtn = document.getElementById("bottomAddBtn");
     const finishShoppingBtn = document.getElementById("finishShoppingBtn");
@@ -803,8 +891,12 @@
     const addModal = document.getElementById("addModal");
     const itemNameInput = document.getElementById("itemNameInput");
     const itemQtyInput = document.getElementById("itemQtyInput");
+    const itemSizeInput = document.getElementById("itemSizeInput");
     const itemPriceInput = document.getElementById("itemPriceInput");
+    const itemNoteInput = document.getElementById("itemNoteInput");
+    const itemPhotoInput = document.getElementById("itemPhotoInput");
     const itemStoreInput = document.getElementById("itemStoreInput");
+    const saleToggleBtn = document.getElementById("saleToggleBtn");
     const suggestionsBox = document.getElementById("suggestionsBox");
     const saveModalItemBtn = document.getElementById("saveModalItemBtn");
     const closeModalBtn = document.getElementById("closeModalBtn");
@@ -815,143 +907,158 @@
     let stores = [...DEFAULT_STORES];
     let selectedStore = "Costco";
     let editingItemId = null;
+    let modalSale = false;
     let unsubscribeItems = null;
     let unsubscribeReceipts = null;
 
-    function showError(message) {
+    function showError(message){
       authError.textContent = message;
       authError.style.display = "block";
     }
 
-    function clearError() {
+    function clearError(){
       authError.textContent = "";
       authError.style.display = "none";
     }
 
-    function setAuthLoading(loading) {
+    function setAuthLoading(loading){
       signInBtn.disabled = loading;
       createAccountBtn.disabled = loading;
       signInBtn.textContent = loading ? "Please wait..." : "Sign In";
       createAccountBtn.textContent = loading ? "Please wait..." : "Create Account";
     }
 
-    function escapeHtml(str) {
+    function escapeHtml(str){
       return String(str ?? "")
-        .replaceAll("&", "&amp;")
-        .replaceAll("<", "&lt;")
-        .replaceAll(">", "&gt;")
-        .replaceAll('"', "&quot;")
-        .replaceAll("'", "&#039;");
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
     }
 
-    function money(value) {
+    function money(value){
       return `$${Number(value || 0).toFixed(2)}`;
     }
 
-    function parsePriceNumber(priceText) {
-      if (!priceText) return 0;
+    function parsePriceNumber(priceText){
+      if(!priceText) return 0;
       const cleaned = String(priceText).trim();
 
       const forMatch = cleaned.match(/^(\d+(\.\d+)?)\s*(for|\/)\s*(\d+(\.\d+)?)$/i);
-      if (forMatch) {
+      if(forMatch){
         const total = parseFloat(forMatch[1]);
         return isNaN(total) ? 0 : total;
       }
 
       const numberMatch = cleaned.match(/(\d+(\.\d+)?)/);
-      if (!numberMatch) return 0;
+      if(!numberMatch) return 0;
 
       const value = parseFloat(numberMatch[1]);
       return isNaN(value) ? 0 : value;
     }
 
-    function itemTotal(item) {
+    function itemTotal(item){
       return parsePriceNumber(item.price) * (Number(item.quantity) || 1);
     }
 
-    function normalizeStoreName(name) {
+    function totalQuantity(items){
+      return items.reduce((sum,item) => sum + (Number(item.quantity) || 1), 0);
+    }
+
+    function normalizeStoreName(name){
       return String(name || "").trim();
     }
 
-    function openAddModal(sourceItem = null) {
+    function setSaleButton(){
+      saleToggleBtn.textContent = modalSale ? "Sale: On" : "Sale: Off";
+      saleToggleBtn.classList.toggle("active", modalSale);
+    }
+
+    function openAddModal(sourceItem = null){
       editingItemId = sourceItem?.id || null;
       itemNameInput.value = sourceItem?.name || "";
       itemQtyInput.value = sourceItem?.quantity || "1";
+      itemSizeInput.value = sourceItem?.size || "";
       itemPriceInput.value = sourceItem?.price || "";
+      itemNoteInput.value = sourceItem?.note || "";
+      itemPhotoInput.value = sourceItem?.photoUrl || "";
       itemStoreInput.value = sourceItem?.store || selectedStore;
+      modalSale = !!sourceItem?.sale;
+      setSaleButton();
       suggestionsBox.classList.add("hidden");
       addModal.classList.remove("hidden");
       setTimeout(() => itemNameInput.focus(), 50);
     }
 
-    function closeAddModal() {
+    function closeAddModal(){
       addModal.classList.add("hidden");
       editingItemId = null;
       suggestionsBox.classList.add("hidden");
     }
 
-    async function handleSignIn() {
+    async function handleSignIn(){
       clearError();
       const email = emailInput.value.trim();
       const password = passwordInput.value.trim();
 
-      if (!email || !password) {
+      if(!email || !password){
         showError("Enter email and password.");
         return;
       }
 
-      try {
+      try{
         setAuthLoading(true);
-        await signInWithEmailAndPassword(auth, email, password);
-      } catch (err) {
+        await signInWithEmailAndPassword(auth,email,password);
+      }catch(err){
         showError(err.message);
         console.error(err);
-      } finally {
+      }finally{
         setAuthLoading(false);
       }
     }
 
-    async function handleCreateAccount() {
+    async function handleCreateAccount(){
       clearError();
       const email = emailInput.value.trim();
       const password = passwordInput.value.trim();
 
-      if (!email || !password) {
+      if(!email || !password){
         showError("Enter email and password.");
         return;
       }
 
-      if (password.length < 6) {
+      if(password.length < 6){
         showError("Password should be at least 6 characters.");
         return;
       }
 
-      try {
+      try{
         setAuthLoading(true);
-        await createUserWithEmailAndPassword(auth, email, password);
-      } catch (err) {
+        await createUserWithEmailAndPassword(auth,email,password);
+      }catch(err){
         showError(err.message);
         console.error(err);
-      } finally {
+      }finally{
         setAuthLoading(false);
       }
     }
 
-    async function handleSignOut() {
-      try {
+    async function handleSignOut(){
+      try{
         await signOut(auth);
-      } catch (err) {
+      }catch(err){
         alert(err.message);
         console.error(err);
       }
     }
 
-    function renderStoreTabs() {
+    function renderStoreTabs(){
       const itemStores = currentItems.map(i => i.store).filter(Boolean);
       const receiptStores = receipts.map(r => r.store).filter(Boolean);
-      stores = Array.from(new Set([...DEFAULT_STORES, ...stores, ...itemStores, ...receiptStores]));
+      stores = Array.from(new Set([...DEFAULT_STORES,...stores,...itemStores,...receiptStores]));
 
-      if (!stores.includes(selectedStore)) selectedStore = stores[0] || "Costco";
+      if(!stores.includes(selectedStore)) selectedStore = stores[0] || "Costco";
 
       storeTabs.innerHTML = "";
 
@@ -971,7 +1078,7 @@
       addBtn.textContent = "+ Add Store";
       addBtn.addEventListener("click", () => {
         const storeName = normalizeStoreName(prompt("New store name:"));
-        if (!storeName) return;
+        if(!storeName) return;
         stores.push(storeName);
         selectedStore = storeName;
         renderAll();
@@ -985,17 +1092,16 @@
         opt.textContent = store;
         itemStoreInput.appendChild(opt);
       });
-
-      currentStoreLabel.textContent = selectedStore;
     }
 
-    function renderAll() {
+    function renderAll(){
       renderStoreTabs();
       renderItems();
       renderHistory();
+      renderExpenses();
     }
 
-    function renderItems() {
+    function renderItems(){
       needList.innerHTML = "";
       gotList.innerHTML = "";
       savedList.innerHTML = "";
@@ -1007,41 +1113,41 @@
       const saved = visibleItems.filter(i => i.status === "saved");
       const future = visibleItems.filter(i => i.status === "future");
 
-      if (!need.length) {
+      if(!need.length){
         needList.innerHTML = `<div class="empty">No items to buy for ${escapeHtml(selectedStore)}.</div>`;
-      } else {
+      }else{
         need.forEach(item => needList.appendChild(buildItemCard(item)));
       }
 
-      if (!got.length) {
+      if(!got.length){
         gotList.innerHTML = `<div class="empty">No picked items yet.</div>`;
-      } else {
+      }else{
         got.forEach(item => gotList.appendChild(buildItemCard(item)));
       }
 
-      if (!saved.length) {
+      if(!saved.length){
         savedList.innerHTML = `<div class="empty">No saved items for ${escapeHtml(selectedStore)}.</div>`;
-      } else {
+      }else{
         saved.forEach(item => savedList.appendChild(buildItemCard(item)));
       }
 
-      if (!future.length) {
+      if(!future.length){
         futureList.innerHTML = `<div class="empty">No future items for ${escapeHtml(selectedStore)}.</div>`;
-      } else {
+      }else{
         future.forEach(item => futureList.appendChild(buildItemCard(item)));
       }
 
-      const total = got.reduce((sum, item) => sum + itemTotal(item), 0);
-      pickedTotal.textContent = money(total);
+      const total = got.reduce((sum,item) => sum + itemTotal(item), 0);
       pickedTotalBottom.textContent = money(total);
-      gotCount.textContent = `${got.length} item${got.length === 1 ? "" : "s"}`;
-      savedCount.textContent = `${saved.length} item${saved.length === 1 ? "" : "s"}`;
-      futureCount.textContent = `${future.length} item${future.length === 1 ? "" : "s"}`;
+
+      gotCount.textContent = `${totalQuantity(got)} item${totalQuantity(got) === 1 ? "" : "s"}`;
+      savedCount.textContent = `${totalQuantity(saved)} item${totalQuantity(saved) === 1 ? "" : "s"}`;
+      futureCount.textContent = `${totalQuantity(future)} item${totalQuantity(future) === 1 ? "" : "s"}`;
     }
 
-    function buildItemCard(item) {
+    function buildItemCard(item){
       const div = document.createElement("div");
-      div.className = `item ${item.status === "got" ? "checked" : ""}`;
+      div.className = `item ${item.status === "got" ? "checked" : ""} ${item.sale ? "sale-item" : ""}`;
 
       const total = itemTotal(item);
       const isSaved = item.status === "saved";
@@ -1049,23 +1155,29 @@
       const canEdit = !isSaved;
 
       let actions = "";
-      if (isSaved) {
+
+      if(isSaved){
         actions = `
           <button class="chip" data-action="addSaved">Add to List</button>
           <button class="chip delete" data-action="delete">Delete</button>
         `;
-      } else if (isFuture) {
+      }else if(isFuture){
         actions = `
-          <button class="chip" data-action="need">Add to Have to Get</button>
+          <button class="chip" data-action="need">Add to Get</button>
           <button class="chip saved" data-action="saved">Move to Saved</button>
           <button class="chip delete" data-action="delete">Delete</button>
         `;
-      } else {
+      }else{
         actions = `
+          <button class="chip sale" data-action="toggleSale">${item.sale ? "Sale On" : "Sale"}</button>
           <button class="chip saved" data-action="saved">Save for Later</button>
           <button class="chip" data-action="future">Future List</button>
           <button class="chip delete" data-action="delete">Delete</button>
         `;
+      }
+
+      if(item.photoUrl){
+        actions = `<button class="chip" data-action="togglePhoto">Photo</button>` + actions;
       }
 
       const checkAction = item.status === "got" ? "need" : "got";
@@ -1078,8 +1190,12 @@
             <input class="inline-qty" type="number" min="1" value="${item.quantity || 1}" />
           </div>
           <div class="mini-field">
+            <label>SIZE</label>
+            <input class="inline-size" type="text" value="${escapeHtml(item.size || "")}" placeholder="Size" />
+          </div>
+          <div class="mini-field">
             <label>PRICE</label>
-            <input class="inline-price" type="text" value="${escapeHtml(item.price || "")}" placeholder="Add price in store" />
+            <input class="inline-price" type="text" value="${escapeHtml(item.price || "")}" placeholder="Add price" />
           </div>
         </div>
       ` : "";
@@ -1089,61 +1205,82 @@
           <button class="check-btn ${item.status === "got" ? "checked" : ""}" ${checkDisabled ? "disabled" : ""} data-action="${checkAction}">
             ${item.status === "got" ? "✓" : ""}
           </button>
+
           <div class="item-main">
-            <div class="item-name">${escapeHtml(item.name || "Untitled item")} × ${item.quantity || 1}</div>
+            <div class="item-name">
+              ${escapeHtml(item.name || "Untitled item")} × ${item.quantity || 1}
+              ${item.sale ? `<span class="badge sale">SALE</span>` : ""}
+              ${item.size ? `<span class="badge size">${escapeHtml(item.size)}</span>` : ""}
+            </div>
+
             <div class="item-meta">
               ${item.price ? `Price: ${escapeHtml(item.price)}` : "Price not added yet"}
               ${total ? ` • Total: ${money(total)}` : ""}
               ${item.store ? ` • Store: ${escapeHtml(item.store)}` : ""}
             </div>
+
+            ${item.note ? `<div class="note-box">${escapeHtml(item.note)}</div>` : ""}
             ${editFields}
+            ${item.photoUrl ? `<img class="photo-preview hidden" src="${escapeHtml(item.photoUrl)}" alt="Item reference photo" />` : ""}
           </div>
         </div>
+
         <div class="item-actions">${actions}</div>
       `;
 
       const qtyInput = div.querySelector(".inline-qty");
+      const sizeInput = div.querySelector(".inline-size");
       const priceInput = div.querySelector(".inline-price");
 
-      async function saveInlineEdits() {
-        if (!qtyInput || !priceInput) return;
+      async function saveInlineEdits(){
+        if(!qtyInput || !priceInput || !sizeInput) return;
 
-        const quantity = parseInt(qtyInput.value, 10) || 1;
+        const quantity = parseInt(qtyInput.value,10) || 1;
         const price = priceInput.value.trim();
+        const size = sizeInput.value.trim();
 
-        try {
-          const ref = doc(db, "groceryItems", item.id);
-          await updateDoc(ref, { quantity, price });
-        } catch (err) {
+        try{
+          const ref = doc(db,"groceryItems",item.id);
+          await updateDoc(ref,{ quantity, price, size });
+        }catch(err){
           alert(err.message);
           console.error(err);
         }
       }
 
-      qtyInput?.addEventListener("change", saveInlineEdits);
-      priceInput?.addEventListener("change", saveInlineEdits);
-      priceInput?.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") {
-          e.preventDefault();
-          priceInput.blur();
-        }
+      qtyInput?.addEventListener("change",saveInlineEdits);
+      sizeInput?.addEventListener("change",saveInlineEdits);
+      priceInput?.addEventListener("change",saveInlineEdits);
+
+      [qtyInput,sizeInput,priceInput].forEach(input => {
+        input?.addEventListener("keydown", e => {
+          if(e.key === "Enter"){
+            e.preventDefault();
+            input.blur();
+          }
+        });
       });
 
       div.querySelectorAll("[data-action]").forEach(btn => {
         btn.addEventListener("click", async () => {
           const action = btn.dataset.action;
-          const ref = doc(db, "groceryItems", item.id);
+          const ref = doc(db,"groceryItems",item.id);
 
-          try {
-            if (action === "delete") {
-              if (!confirm(`Delete ${item.name}?`)) return;
+          try{
+            if(action === "delete"){
+              if(!confirm(`Delete ${item.name}?`)) return;
               await deleteDoc(ref);
-            } else if (action === "addSaved") {
+            }else if(action === "addSaved"){
               openAddModal(item);
-            } else {
-              await updateDoc(ref, { status: action });
+            }else if(action === "toggleSale"){
+              await updateDoc(ref,{ sale: !item.sale });
+            }else if(action === "togglePhoto"){
+              const img = div.querySelector(".photo-preview");
+              img?.classList.toggle("hidden");
+            }else{
+              await updateDoc(ref,{ status: action });
             }
-          } catch (err) {
+          }catch(err){
             alert(err.message);
             console.error(err);
           }
@@ -1153,59 +1290,75 @@
       return div;
     }
 
-    async function handleAddItem() {
-      if (!currentUser) {
+    async function handleAddItem(){
+      if(!currentUser){
         alert("Please sign in first.");
         return;
       }
 
       const name = itemNameInput.value.trim();
-      const quantity = parseInt(itemQtyInput.value, 10) || 1;
+      const quantity = parseInt(itemQtyInput.value,10) || 1;
+      const size = itemSizeInput.value.trim();
       const price = itemPriceInput.value.trim();
+      const note = itemNoteInput.value.trim();
+      const photoUrl = itemPhotoInput.value.trim();
       const store = itemStoreInput.value || selectedStore;
 
-      if (!name) {
+      if(!name){
         alert("Enter an item name.");
         itemNameInput.focus();
         return;
       }
 
-      try {
-        if (editingItemId) {
-          const ref = doc(db, "groceryItems", editingItemId);
-          await updateDoc(ref, {
+      try{
+        if(editingItemId){
+          const ref = doc(db,"groceryItems",editingItemId);
+          await updateDoc(ref,{
             name,
             quantity,
+            size,
             price,
+            note,
+            photoUrl,
+            sale: modalSale,
             store,
-            status: "need"
+            status:"need"
           });
-        } else {
+        }else{
           const sameActive = currentItems.find(i =>
             (i.store || "Costco") === store &&
-            ["need", "got"].includes(i.status) &&
-            String(i.name || "").toLowerCase() === name.toLowerCase()
+            ["need","got"].includes(i.status) &&
+            String(i.name || "").toLowerCase() === name.toLowerCase() &&
+            String(i.size || "").toLowerCase() === size.toLowerCase()
           );
 
-          if (sameActive) {
-            const ok = confirm(`${name} is already on the current list for ${store}. Update quantity/price instead?`);
-            if (ok) {
-              const ref = doc(db, "groceryItems", sameActive.id);
-              await updateDoc(ref, {
+          if(sameActive){
+            const ok = confirm(`${name}${size ? " (" + size + ")" : ""} is already on the current list for ${store}. Update quantity/price instead?`);
+            if(ok){
+              const ref = doc(db,"groceryItems",sameActive.id);
+              await updateDoc(ref,{
                 quantity,
+                size,
                 price,
-                status: "need"
+                note,
+                photoUrl,
+                sale: modalSale,
+                status:"need"
               });
-            } else {
+            }else{
               return;
             }
-          } else {
-            await addDoc(collection(db, "groceryItems"), {
+          }else{
+            await addDoc(collection(db,"groceryItems"),{
               name,
               quantity,
+              size,
               price,
+              note,
+              photoUrl,
+              sale: modalSale,
               store,
-              status: "need",
+              status:"need",
               createdBy: currentUser.email || currentUser.uid,
               createdAt: serverTimestamp()
             });
@@ -1214,66 +1367,100 @@
 
         selectedStore = store;
         closeAddModal();
-      } catch (err) {
+      }catch(err){
         alert(err.message);
         console.error(err);
       }
     }
 
-    async function finishShopping() {
-      if (!currentUser) {
+    async function finishShopping(){
+      if(!currentUser){
         alert("Please sign in first.");
         return;
       }
 
       const gotItems = currentItems.filter(i => (i.store || "Costco") === selectedStore && i.status === "got");
 
-      if (!gotItems.length) {
+      if(!gotItems.length){
         alert("No checked items to save for this store.");
         return;
       }
 
-      const total = gotItems.reduce((sum, item) => sum + itemTotal(item), 0);
+      const total = gotItems.reduce((sum,item) => sum + itemTotal(item),0);
+      const count = totalQuantity(gotItems);
 
-      const ok = confirm(`Save receipt for ${selectedStore} with ${gotItems.length} item(s), total ${money(total)}?`);
-      if (!ok) return;
+      const ok = confirm(`Save receipt for ${selectedStore} with ${count} total item(s), total ${money(total)}?`);
+      if(!ok) return;
 
-      try {
-        await addDoc(collection(db, "receipts"), {
-          store: selectedStore,
+      try{
+        await addDoc(collection(db,"receipts"),{
+          store:selectedStore,
           total,
-          itemCount: gotItems.length,
-          items: gotItems.map(item => ({
-            name: item.name || "",
-            quantity: item.quantity || 1,
-            price: item.price || "",
-            total: itemTotal(item)
+          itemCount:count,
+          items:gotItems.map(item => ({
+            name:item.name || "",
+            quantity:item.quantity || 1,
+            size:item.size || "",
+            price:item.price || "",
+            note:item.note || "",
+            sale:!!item.sale,
+            total:itemTotal(item)
           })),
-          createdBy: currentUser.email || currentUser.uid,
-          createdAt: serverTimestamp(),
-          createdAtText: new Date().toISOString()
+          createdBy:currentUser.email || currentUser.uid,
+          createdAt:serverTimestamp(),
+          createdAtText:new Date().toISOString()
         });
 
         const batch = writeBatch(db);
         gotItems.forEach(item => {
-          const ref = doc(db, "groceryItems", item.id);
-          batch.update(ref, { status: "saved" });
+          const ref = doc(db,"groceryItems",item.id);
+          batch.update(ref,{ status:"saved" });
         });
         await batch.commit();
 
         alert("Shopping receipt saved. Picked items moved to Saved.");
-      } catch (err) {
+      }catch(err){
         alert(err.message);
         console.error(err);
       }
     }
 
-    function renderHistory() {
+    function getReceiptDate(receipt){
+      if(receipt.createdAt?.toDate) return receipt.createdAt.toDate();
+      if(receipt.createdAtText) return new Date(receipt.createdAtText);
+      return null;
+    }
+
+    function renderExpenses(){
+      const now = new Date();
+      const month = now.getMonth();
+      const year = now.getFullYear();
+
+      let monthly = 0;
+      let annual = 0;
+
+      receipts.forEach(receipt => {
+        const date = getReceiptDate(receipt);
+        if(!date || isNaN(date)) return;
+
+        if(date.getFullYear() === year){
+          annual += Number(receipt.total || 0);
+          if(date.getMonth() === month){
+            monthly += Number(receipt.total || 0);
+          }
+        }
+      });
+
+      monthlySpent.textContent = money(monthly);
+      annualSpent.textContent = money(annual);
+    }
+
+    function renderHistory(){
       historyList.innerHTML = "";
 
       const filtered = receipts.filter(r => (r.store || "Costco") === selectedStore);
 
-      if (!filtered.length) {
+      if(!filtered.length){
         historyList.innerHTML = `<div class="empty">No shopping history for ${escapeHtml(selectedStore)} yet.</div>`;
         return;
       }
@@ -1282,18 +1469,18 @@
         const div = document.createElement("div");
         div.className = "history-item";
 
-        const date = receipt.createdAt?.toDate
-          ? receipt.createdAt.toDate()
-          : receipt.createdAtText
-            ? new Date(receipt.createdAtText)
-            : null;
+        const date = getReceiptDate(receipt);
 
         const dateText = date && !isNaN(date)
           ? date.toLocaleString([], { month:"short", day:"numeric", year:"numeric", hour:"numeric", minute:"2-digit" })
           : "Saved receipt";
 
         const itemLines = (receipt.items || [])
-          .map(i => `${escapeHtml(i.name)} × ${i.quantity || 1} — ${i.price ? escapeHtml(i.price) : "no price"}${i.total ? ` (${money(i.total)})` : ""}`)
+          .map(i => {
+            const size = i.size ? ` • ${escapeHtml(i.size)}` : "";
+            const sale = i.sale ? ` • SALE` : "";
+            return `${escapeHtml(i.name)}${size} × ${i.quantity || 1} — ${i.price ? escapeHtml(i.price) : "no price"}${i.total ? ` (${money(i.total)})` : ""}${sale}`;
+          })
           .join("<br>");
 
         div.innerHTML = `
@@ -1301,67 +1488,99 @@
             <div>${escapeHtml(receipt.store || selectedStore)}</div>
             <div>${money(receipt.total || 0)}</div>
           </div>
-          <div class="history-meta">${dateText} • ${receipt.itemCount || (receipt.items || []).length} item(s)</div>
+
+          <div class="history-meta">
+            ${dateText} • ${receipt.itemCount || totalQuantity(receipt.items || [])} item(s)
+          </div>
+
           <div class="history-details">${itemLines || "No item details."}</div>
+
+          <div class="item-actions">
+            <button class="chip delete" data-action="deleteReceipt">Delete Receipt</button>
+          </div>
         `;
+
+        div.querySelector("[data-action='deleteReceipt']").addEventListener("click", async () => {
+          const ok = confirm(`Delete this ${receipt.store || selectedStore} receipt for ${money(receipt.total || 0)}?`);
+          if(!ok) return;
+
+          try{
+            await deleteDoc(doc(db,"receipts",receipt.id));
+          }catch(err){
+            alert(err.message);
+            console.error(err);
+          }
+        });
 
         historyList.appendChild(div);
       });
     }
 
-    function watchItems() {
-      if (unsubscribeItems) unsubscribeItems();
+    function watchItems(){
+      if(unsubscribeItems) unsubscribeItems();
 
-      const q = query(collection(db, "groceryItems"), orderBy("createdAt", "desc"));
-      unsubscribeItems = onSnapshot(q, (snap) => {
-        currentItems = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const q = query(collection(db,"groceryItems"), orderBy("createdAt","desc"));
+
+      unsubscribeItems = onSnapshot(q, snap => {
+        currentItems = snap.docs.map(d => ({ id:d.id, ...d.data() }));
         renderAll();
-      }, (err) => {
+      }, err => {
         console.error(err);
         alert("Could not load grocery items. Check Firestore rules.");
       });
     }
 
-    function watchReceipts() {
-      if (unsubscribeReceipts) unsubscribeReceipts();
+    function watchReceipts(){
+      if(unsubscribeReceipts) unsubscribeReceipts();
 
-      const q = query(collection(db, "receipts"), orderBy("createdAt", "desc"));
-      unsubscribeReceipts = onSnapshot(q, (snap) => {
-        receipts = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+      const q = query(collection(db,"receipts"), orderBy("createdAt","desc"));
+
+      unsubscribeReceipts = onSnapshot(q, snap => {
+        receipts = snap.docs.map(d => ({ id:d.id, ...d.data() }));
         renderAll();
-      }, (err) => {
+      }, err => {
         console.error(err);
         alert("Could not load shopping history. Check Firestore rules for receipts.");
       });
     }
 
-    function getSuggestionPool() {
+    function getSuggestionPool(){
       const map = new Map();
 
       currentItems.forEach(item => {
-        if (!item.name) return;
-        const key = `${item.name.toLowerCase()}__${item.store || "Costco"}`;
-        map.set(key, {
-          name: item.name,
-          quantity: item.quantity || 1,
-          price: item.price || "",
-          store: item.store || selectedStore,
-          source: item.status === "saved" ? "Saved" : item.status === "future" ? "Future" : "Current"
+        if(!item.name) return;
+        const key = `${item.name.toLowerCase()}__${item.size || ""}__${item.store || "Costco"}`;
+        map.set(key,{
+          name:item.name,
+          quantity:item.quantity || 1,
+          size:item.size || "",
+          price:item.price || "",
+          note:item.note || "",
+          photoUrl:item.photoUrl || "",
+          sale:!!item.sale,
+          store:item.store || selectedStore,
+          source:item.status === "saved" ? "Saved" : item.status === "future" ? "Future" : "Current"
         });
       });
 
       receipts.forEach(receipt => {
         (receipt.items || []).forEach(item => {
-          if (!item.name) return;
+          if(!item.name) return;
+
           const store = receipt.store || selectedStore;
-          const key = `${item.name.toLowerCase()}__${store}`;
-          if (!map.has(key)) {
-            map.set(key, {
-              name: item.name,
-              quantity: item.quantity || 1,
-              price: item.price || "",
+          const key = `${item.name.toLowerCase()}__${item.size || ""}__${store}`;
+
+          if(!map.has(key)){
+            map.set(key,{
+              name:item.name,
+              quantity:item.quantity || 1,
+              size:item.size || "",
+              price:item.price || "",
+              note:item.note || "",
+              photoUrl:"",
+              sale:!!item.sale,
               store,
-              source: "History"
+              source:"History"
             });
           }
         });
@@ -1370,10 +1589,10 @@
       return Array.from(map.values());
     }
 
-    function renderSuggestions() {
+    function renderSuggestions(){
       const text = itemNameInput.value.trim().toLowerCase();
 
-      if (!text || text.length < 2) {
+      if(!text || text.length < 2){
         suggestionsBox.classList.add("hidden");
         suggestionsBox.innerHTML = "";
         return;
@@ -1381,93 +1600,113 @@
 
       const matches = getSuggestionPool()
         .filter(item => item.name.toLowerCase().includes(text))
-        .slice(0, 6);
+        .slice(0,8);
 
-      if (!matches.length) {
+      if(!matches.length){
         suggestionsBox.classList.add("hidden");
         suggestionsBox.innerHTML = "";
         return;
       }
 
       suggestionsBox.innerHTML = "";
+
       matches.forEach(item => {
         const div = document.createElement("div");
         div.className = "suggestion";
         div.innerHTML = `
-          <strong>${escapeHtml(item.name)}</strong>
-          <span>${escapeHtml(item.store)} • ${item.price ? escapeHtml(item.price) : "no price"} • from ${escapeHtml(item.source)}</span>
+          <strong>${escapeHtml(item.name)} ${item.size ? `(${escapeHtml(item.size)})` : ""}</strong>
+          <span>
+            ${escapeHtml(item.store)}
+            • ${item.price ? escapeHtml(item.price) : "no price"}
+            ${item.sale ? " • SALE" : ""}
+            • from ${escapeHtml(item.source)}
+          </span>
         `;
+
         div.addEventListener("click", () => {
           itemNameInput.value = item.name;
           itemQtyInput.value = item.quantity || 1;
+          itemSizeInput.value = item.size || "";
           itemPriceInput.value = item.price || "";
+          itemNoteInput.value = item.note || "";
+          itemPhotoInput.value = item.photoUrl || "";
           itemStoreInput.value = item.store || selectedStore;
+          modalSale = !!item.sale;
+          setSaleButton();
           suggestionsBox.classList.add("hidden");
         });
+
         suggestionsBox.appendChild(div);
       });
 
       suggestionsBox.classList.remove("hidden");
     }
 
+    signInBtn.addEventListener("click",handleSignIn);
+    createAccountBtn.addEventListener("click",handleCreateAccount);
+    signOutBtn.addEventListener("click",handleSignOut);
 
-    signInBtn.addEventListener("click", handleSignIn);
-    createAccountBtn.addEventListener("click", handleCreateAccount);
-    signOutBtn.addEventListener("click", handleSignOut);
+    bottomAddBtn.addEventListener("click",() => openAddModal());
+    saveModalItemBtn.addEventListener("click",handleAddItem);
+    closeModalBtn.addEventListener("click",closeAddModal);
 
-    bottomAddBtn.addEventListener("click", openAddModal);
-    saveModalItemBtn.addEventListener("click", handleAddItem);
-    closeModalBtn.addEventListener("click", closeAddModal);
+    finishShoppingBtn.addEventListener("click",finishShopping);
+    finishShoppingTopBtn.addEventListener("click",finishShopping);
 
-    finishShoppingBtn.addEventListener("click", finishShopping);
-    finishShoppingTopBtn.addEventListener("click", finishShopping);
+    toggleSavedBtn.addEventListener("click",() => savedWrap.classList.toggle("hidden"));
+    toggleFutureBtn.addEventListener("click",() => futureWrap.classList.toggle("hidden"));
+    toggleHistoryBtn.addEventListener("click",() => historyWrap.classList.toggle("hidden"));
 
-    toggleSavedBtn.addEventListener("click", () => savedWrap.classList.toggle("hidden"));
-    toggleFutureBtn.addEventListener("click", () => futureWrap.classList.toggle("hidden"));
-    toggleHistoryBtn.addEventListener("click", () => historyWrap.classList.toggle("hidden"));
+    itemNameInput.addEventListener("input",renderSuggestions);
 
-    itemNameInput.addEventListener("input", renderSuggestions);
-
-    addModal.addEventListener("click", (e) => {
-      if (e.target === addModal) closeAddModal();
+    saleToggleBtn.addEventListener("click",() => {
+      modalSale = !modalSale;
+      setSaleButton();
     });
 
-    [emailInput, passwordInput].forEach(el => {
-      el.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") handleSignIn();
+    addModal.addEventListener("click", e => {
+      if(e.target === addModal) closeAddModal();
+    });
+
+    [emailInput,passwordInput].forEach(el => {
+      el.addEventListener("keydown", e => {
+        if(e.key === "Enter") handleSignIn();
       });
     });
 
-    [itemNameInput, itemQtyInput, itemPriceInput].forEach(el => {
-      el.addEventListener("keydown", (e) => {
-        if (e.key === "Enter") handleAddItem();
+    [itemNameInput,itemQtyInput,itemSizeInput,itemPriceInput,itemNoteInput,itemPhotoInput].forEach(el => {
+      el.addEventListener("keydown", e => {
+        if(e.key === "Enter" && el.tagName !== "TEXTAREA"){
+          handleAddItem();
+        }
       });
     });
 
-    onAuthStateChanged(auth, (user) => {
+    onAuthStateChanged(auth, user => {
       currentUser = user;
 
-      if (user) {
+      if(user){
         authScreen.style.display = "none";
         appShell.style.display = "block";
         bottomBar.classList.remove("hidden");
         accountText.textContent = `Account: ${user.email}`;
         watchItems();
         watchReceipts();
-      } else {
+      }else{
         authScreen.style.display = "block";
         appShell.style.display = "none";
         bottomBar.classList.add("hidden");
+
         currentItems = [];
         receipts = [];
         renderAll();
 
-        if (unsubscribeItems) {
+        if(unsubscribeItems){
           unsubscribeItems();
           unsubscribeItems = null;
         }
 
-        if (unsubscribeReceipts) {
+        if(unsubscribeReceipts){
           unsubscribeReceipts();
           unsubscribeReceipts = null;
         }
