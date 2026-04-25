@@ -22,6 +22,31 @@
       --highlight:#fff3bf;
       --shadow:0 12px 30px rgba(35,55,80,.08);
       --radius:24px;
+      --get-bg:#fffaf0; --get-border:#f2d39b; --get-open:#fff1d6;
+      --got-bg:#f0fbf3; --got-border:#b8dec3; --got-open:#e3f7e9;
+      --saved-bg:#f3f7ff; --saved-border:#c9d8f0; --saved-open:#e8f0ff;
+      --future-bg:#f8f1ff; --future-border:#dbc8ee; --future-open:#f1e5ff;
+      --detail-bg:#ffffff; --detail-border:#bdd4e2;
+    }
+
+    body.dark{
+      --bg:#101923;
+      --card:#172332;
+      --text:#e8f1f7;
+      --muted:#9eb1c2;
+      --border:#2d4052;
+      --blue:#4c9be8;
+      --blue-dark:#2f7ec6;
+      --green:#45b864;
+      --green-dark:#2f9850;
+      --red:#ff8c82;
+      --sale:#ffcf5a;
+      --shadow:0 14px 34px rgba(0,0,0,.25);
+      --get-bg:#2a2419; --get-border:#705637; --get-open:#362c1d;
+      --got-bg:#193025; --got-border:#3d7952; --got-open:#203c2d;
+      --saved-bg:#18283d; --saved-border:#3b5f8d; --saved-open:#203653;
+      --future-bg:#2a2038; --future-border:#644d82; --future-open:#352749;
+      --detail-bg:#111d2a; --detail-border:#466173;
     }
 
     *{box-sizing:border-box}
@@ -520,7 +545,7 @@
       max-width:900px;
       margin:0 auto;
       display:grid;
-      grid-template-columns:1fr auto auto auto;
+      grid-template-columns:1fr auto auto auto auto;
       gap:10px;
       align-items:center;
     }
@@ -581,6 +606,109 @@
       font-size:12px;
       font-weight:700;
     }
+
+
+    .theme-btn{
+      width:38px;
+      height:38px;
+      border-radius:999px;
+      padding:0;
+      font-size:17px;
+    }
+
+    body.dark .btn-ghost{background:#1c2b3a}
+    body.dark .card,
+    body.dark .modal-card,
+    body.dark .total-box{background:var(--card)}
+    body.dark .field input,
+    body.dark .field select,
+    body.dark .field textarea{
+      background:#0f1924;
+      border-color:#3a5166;
+      color:#e8f1f7;
+    }
+    body.dark .bottom-bar{background:rgba(16,25,35,.96)}
+
+    .item.need-item{background:var(--get-bg);border-color:var(--get-border)}
+    .item.got-item{background:var(--got-bg);border-color:var(--got-border)}
+    .item.saved-item{background:var(--saved-bg);border-color:var(--saved-border)}
+    .item.future-item{background:var(--future-bg);border-color:var(--future-border)}
+    .item.need-item.expanded{background:var(--get-open)}
+    .item.got-item.expanded{background:var(--got-open)}
+    .item.saved-item.expanded{background:var(--saved-open)}
+    .item.future-item.expanded{background:var(--future-open)}
+    .item.expanded{box-shadow:0 0 0 3px rgba(47,115,183,.12), var(--shadow)}
+
+    .item-expand{
+      margin-top:12px;
+      padding:12px;
+      border-radius:18px;
+      border:2px solid var(--detail-border);
+      background:var(--detail-bg);
+      cursor:default;
+    }
+
+    .quick-edit-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .mini-field label{
+      display:block;
+      font-size:10px;
+      font-weight:900;
+      color:var(--muted);
+      letter-spacing:.08em;
+      margin-bottom:4px;
+    }
+
+    .mini-field input,
+    .mini-field textarea{
+      width:100%;
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:10px;
+      font-size:14px;
+      background:#fff;
+      color:#27435a;
+      outline:none;
+      font-family:inherit;
+    }
+
+    body.dark .mini-field input,
+    body.dark .mini-field textarea{
+      background:#0f1924;
+      color:#e8f1f7;
+      border-color:#3a5166;
+    }
+
+    .mini-field textarea{
+      min-height:70px;
+      resize:vertical;
+    }
+
+    .quick-note{grid-column:1 / -1}
+
+    .quick-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+
+    .chip{
+      font-size:12px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:#fff;
+      cursor:pointer;
+      font-weight:800;
+      color:var(--text);
+    }
+
+    body.dark .chip{background:#172332}
 
     @media (max-width:700px){
       .wrap{
@@ -714,6 +842,7 @@
       <button id="bottomAddBtn" class="btn btn-green">+ Add</button>
       <button id="expenseBtn" class="btn btn-ghost">Expense</button>
       <button id="finishShoppingBtn" class="btn btn-primary">Finish</button>
+      <button id="themeToggleBtn" class="btn btn-ghost theme-btn" title="Toggle theme">◐</button>
     </div>
   </div>
 
@@ -894,6 +1023,7 @@
     const bottomAddBtn = document.getElementById("bottomAddBtn");
     const expenseBtn = document.getElementById("expenseBtn");
     const finishShoppingBtn = document.getElementById("finishShoppingBtn");
+    const themeToggleBtn = document.getElementById("themeToggleBtn");
 
     const addModal = document.getElementById("addModal");
     const itemModalTitle = document.getElementById("itemModalTitle");
@@ -932,9 +1062,33 @@
     let stores = [...DEFAULT_STORES];
     let selectedStore = "Costco";
     let editingItemId = null;
+    let expandedItemId = null;
     let modalSale = false;
     let unsubscribeItems = null;
     let unsubscribeReceipts = null;
+
+    function applyInitialTheme(){
+      const savedTheme = localStorage.getItem("groceryTheme");
+      if(savedTheme === "dark" || savedTheme === "light"){
+        document.body.classList.toggle("dark", savedTheme === "dark");
+      }else{
+        const hour = new Date().getHours();
+        document.body.classList.toggle("dark", hour >= 19 || hour < 7);
+      }
+      updateThemeButton();
+    }
+
+    function updateThemeButton(){
+      if(themeToggleBtn){
+        themeToggleBtn.textContent = document.body.classList.contains("dark") ? "☀️" : "🌙";
+      }
+    }
+
+    function toggleTheme(){
+      document.body.classList.toggle("dark");
+      localStorage.setItem("groceryTheme", document.body.classList.contains("dark") ? "dark" : "light");
+      updateThemeButton();
+    }
 
     function showError(message){
       authError.textContent = message;
@@ -1002,8 +1156,8 @@
 
     function openAddModal(sourceItem = null){
       editingItemId = sourceItem?.id || null;
-      itemModalTitle.textContent = editingItemId ? "Edit Item" : "Add Item";
-      saveModalItemBtn.textContent = editingItemId ? "Save Changes" : "Save Item";
+      itemModalTitle.textContent = editingItemId ? "Full Edit Item" : "Add Item";
+      saveModalItemBtn.textContent = editingItemId ? "Save Full Edit" : "Save Item";
       editExtraActions.classList.toggle("hidden", !editingItemId);
 
       itemNameInput.value = sourceItem?.name || "";
@@ -1098,6 +1252,7 @@
         btn.textContent = store;
         btn.addEventListener("click", () => {
           selectedStore = store;
+          expandedItemId = null;
           renderAll();
         });
         storeTabs.appendChild(btn);
@@ -1111,6 +1266,7 @@
         if(!storeName) return;
         stores.push(storeName);
         selectedStore = storeName;
+        expandedItemId = null;
         renderAll();
       });
       storeTabs.appendChild(addBtn);
@@ -1174,9 +1330,24 @@
       futureCount.textContent = `${totalQuantity(future)} item${totalQuantity(future) === 1 ? "" : "s"}`;
     }
 
+    function statusClass(status){
+      if(status === "got") return "got-item";
+      if(status === "saved") return "saved-item";
+      if(status === "future") return "future-item";
+      return "need-item";
+    }
+
+    function statusLabel(status){
+      if(status === "got") return "Got";
+      if(status === "saved") return "Saved";
+      if(status === "future") return "Future";
+      return "Get";
+    }
+
     function buildItemCard(item){
       const div = document.createElement("div");
-      div.className = `item ${item.status === "got" ? "checked" : ""} ${item.sale ? "sale-item" : ""}`;
+      const expanded = expandedItemId === item.id;
+      div.className = `item ${statusClass(item.status)} ${expanded ? "expanded" : ""}`;
 
       const total = itemTotal(item);
       const isSaved = item.status === "saved";
@@ -1193,6 +1364,7 @@
           <div class="item-main">
             <div class="item-name">
               ${escapeHtml(item.name || "Untitled item")} × ${item.quantity || 1}
+              <span class="badge">${statusLabel(item.status)}</span>
               ${item.sale ? `<span class="badge sale">SALE</span>` : ""}
               ${item.size ? `<span class="badge size">${escapeHtml(item.size)}</span>` : ""}
             </div>
@@ -1200,16 +1372,19 @@
             <div class="item-meta">
               ${item.price ? `Price: ${escapeHtml(item.price)}` : "Price not added yet"}
               ${total ? ` • Rough total: ${money(total)}` : ""}
-              ${item.store ? ` • ${escapeHtml(item.store)}` : ""}
             </div>
 
             ${item.note ? `<div class="note-box">${escapeHtml(item.note)}</div>` : ""}
-            ${item.photoUrl ? `<img class="photo-preview" src="${escapeHtml(item.photoUrl)}" alt="Item reference photo" />` : ""}
           </div>
         </div>
+
+        ${expanded ? buildExpandedItemHtml(item) : ""}
       `;
 
-      div.addEventListener("click", () => openAddModal(item));
+      div.addEventListener("click", () => {
+        expandedItemId = expanded ? null : item.id;
+        renderItems();
+      });
 
       div.querySelector("[data-action]")?.addEventListener("click", async e => {
         e.stopPropagation();
@@ -1224,7 +1399,99 @@
         }
       });
 
+      if(expanded){
+        wireExpandedItem(div,item);
+      }
+
       return div;
+    }
+
+    function buildExpandedItemHtml(item){
+      const canCheck = !["saved","future"].includes(item.status);
+      return `
+        <div class="item-expand" onclick="event.stopPropagation()">
+          <div class="quick-edit-grid">
+            <div class="mini-field">
+              <label>QUANTITY</label>
+              <input class="quick-qty" type="number" min="1" value="${item.quantity || 1}" />
+            </div>
+
+            <div class="mini-field">
+              <label>PRICE</label>
+              <input class="quick-price" type="text" value="${escapeHtml(item.price || "")}" placeholder="9.99 or 9.99 for 2" />
+            </div>
+
+            <div class="mini-field quick-note">
+              <label>FREE TEXT / NOTE</label>
+              <textarea class="quick-note-input" placeholder="Brand, reminder, aisle, etc.">${escapeHtml(item.note || "")}</textarea>
+            </div>
+          </div>
+
+          ${item.photoUrl ? `<img class="photo-preview" src="${escapeHtml(item.photoUrl)}" alt="Item reference photo" />` : ""}
+
+          <div class="quick-actions">
+            ${item.status !== "need" ? `<button class="chip" data-quick="need">Move to Get</button>` : ""}
+            ${item.status !== "got" && canCheck ? `<button class="chip" data-quick="got">Move to Got</button>` : ""}
+            ${item.status !== "future" ? `<button class="chip" data-quick="future">Move to Future</button>` : ""}
+            ${item.status !== "saved" ? `<button class="chip" data-quick="saved">Move to Saved</button>` : ""}
+            <button class="chip" data-quick="sale">${item.sale ? "Sale On" : "Sale Off"}</button>
+            <button class="chip" data-quick="fullEdit">Edit</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function wireExpandedItem(div,item){
+      const qty = div.querySelector(".quick-qty");
+      const price = div.querySelector(".quick-price");
+      const note = div.querySelector(".quick-note-input");
+
+      let saveTimer = null;
+
+      function scheduleSave(){
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(saveQuickEdits, 550);
+      }
+
+      async function saveQuickEdits(){
+        try{
+          await updateDoc(doc(db,"groceryItems",item.id),{
+            quantity: parseInt(qty.value,10) || 1,
+            price: price.value.trim(),
+            note: note.value.trim()
+          });
+        }catch(err){
+          alert(err.message);
+          console.error(err);
+        }
+      }
+
+      [qty,price,note].forEach(input => {
+        input.addEventListener("input",scheduleSave);
+        input.addEventListener("change",saveQuickEdits);
+        input.addEventListener("click", e => e.stopPropagation());
+      });
+
+      div.querySelectorAll("[data-quick]").forEach(btn => {
+        btn.addEventListener("click", async e => {
+          e.stopPropagation();
+          const action = btn.dataset.quick;
+
+          try{
+            if(action === "fullEdit"){
+              openAddModal(item);
+            }else if(action === "sale"){
+              await updateDoc(doc(db,"groceryItems",item.id),{ sale: !item.sale });
+            }else{
+              await updateDoc(doc(db,"groceryItems",item.id),{ status: action });
+              expandedItemId = null;
+            }
+          }catch(err){
+            alert(err.message);
+            console.error(err);
+          }
+        });
+      });
     }
 
     async function updateEditingItemStatus(status){
@@ -1753,6 +2020,7 @@
     finishShoppingBtn.addEventListener("click",openFinishModal);
     closeFinishBtn.addEventListener("click",() => finishModal.classList.add("hidden"));
     saveReceiptBtn.addEventListener("click",saveReceipt);
+    themeToggleBtn.addEventListener("click",toggleTheme);
 
     moveNeedBtn.addEventListener("click",() => updateEditingItemStatus("need"));
     moveFutureBtn.addEventListener("click",() => updateEditingItemStatus("future"));
@@ -1796,6 +2064,8 @@
       });
     });
 
+    applyInitialTheme();
+
     onAuthStateChanged(auth, user => {
       currentUser = user;
 
@@ -1813,6 +2083,7 @@
 
         currentItems = [];
         receipts = [];
+        expandedItemId = null;
         renderAll();
 
         if(unsubscribeItems){
