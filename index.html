@@ -1,0 +1,2076 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Grocery App</title>
+
+  <style>
+    :root{
+      --bg:#eef5f7;
+      --card:#ffffff;
+      --text:#27435a;
+      --muted:#6c8294;
+      --border:#d9e4ea;
+      --blue:#2f73b7;
+      --blue-dark:#245f98;
+      --green:#2da44e;
+      --green-dark:#23863f;
+      --red:#b42318;
+      --orange:#a15c12;
+      --sale:#ffb703;
+      --highlight:#fff3bf;
+      --shadow:0 12px 30px rgba(35,55,80,.08);
+      --radius:24px;
+      --get-bg:#fffaf0; --get-border:#f2d39b; --get-open:#fff1d6;
+      --got-bg:#f0fbf3; --got-border:#b8dec3; --got-open:#e3f7e9;
+      --saved-bg:#f3f7ff; --saved-border:#c9d8f0; --saved-open:#e8f0ff;
+      --future-bg:#f8f1ff; --future-border:#dbc8ee; --future-open:#f1e5ff;
+      --detail-bg:#ffffff; --detail-border:#bdd4e2;
+    }
+
+    body.dark{
+      --bg:#101923;
+      --card:#172332;
+      --text:#e8f1f7;
+      --muted:#9eb1c2;
+      --border:#2d4052;
+      --blue:#4c9be8;
+      --blue-dark:#2f7ec6;
+      --green:#45b864;
+      --green-dark:#2f9850;
+      --red:#ff8c82;
+      --sale:#ffcf5a;
+      --shadow:0 14px 34px rgba(0,0,0,.25);
+      --get-bg:#2a2419; --get-border:#705637; --get-open:#362c1d;
+      --got-bg:#193025; --got-border:#3d7952; --got-open:#203c2d;
+      --saved-bg:#18283d; --saved-border:#3b5f8d; --saved-open:#203653;
+      --future-bg:#2a2038; --future-border:#644d82; --future-open:#352749;
+      --detail-bg:#111d2a; --detail-border:#466173;
+    }
+
+    *{box-sizing:border-box}
+
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
+
+    .wrap{
+      max-width:900px;
+      margin:0 auto;
+      padding:18px 16px 165px;
+      min-height:100vh;
+    }
+
+    .hidden{display:none !important}
+
+    .card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+    }
+
+    .auth-card{
+      max-width:520px;
+      margin:40px auto 0;
+      padding:26px;
+    }
+
+    .auth-title{
+      margin:0 0 8px;
+      text-align:center;
+      letter-spacing:.08em;
+    }
+
+    .auth-sub{
+      text-align:center;
+      color:var(--muted);
+      margin:0 0 22px;
+      font-size:14px;
+    }
+
+    .field{margin-bottom:14px}
+
+    .field label{
+      display:block;
+      font-size:13px;
+      color:var(--muted);
+      margin-bottom:6px;
+      font-weight:700;
+      letter-spacing:.04em;
+    }
+
+    .field input,
+    .field select,
+    .field textarea{
+      width:100%;
+      padding:14px;
+      border-radius:14px;
+      border:2px solid #cfdbe3;
+      outline:none;
+      font-size:16px;
+      background:#fff;
+      font-family:inherit;
+    }
+
+    .field textarea{
+      min-height:80px;
+      resize:vertical;
+    }
+
+    .field input:focus,
+    .field select:focus,
+    .field textarea:focus{
+      border-color:var(--blue);
+      box-shadow:0 0 0 4px rgba(47,115,183,.12);
+    }
+
+    .error-box{
+      display:none;
+      margin-bottom:14px;
+      background:#fff2f0;
+      color:var(--red);
+      border:1px solid #f0c2bc;
+      padding:12px 14px;
+      border-radius:14px;
+      font-size:14px;
+    }
+
+    .btn{
+      border:none;
+      border-radius:16px;
+      padding:13px 16px;
+      font-size:15px;
+      font-weight:800;
+      cursor:pointer;
+      transition:.18s ease;
+    }
+
+    .btn:disabled{
+      opacity:.55;
+      cursor:not-allowed;
+    }
+
+    .btn-primary{background:var(--blue);color:#fff}
+    .btn-primary:hover{background:var(--blue-dark)}
+
+    .btn-green{background:var(--green);color:#fff}
+    .btn-green:hover{background:var(--green-dark)}
+
+    .btn-ghost{
+      background:#f4f8fa;
+      color:var(--text);
+      border:1px solid var(--border);
+    }
+
+    .btn-danger{
+      background:#fff2f0;
+      color:var(--red);
+      border:1px solid #f0c2bc;
+    }
+
+    .btn-small{
+      padding:9px 12px;
+      border-radius:12px;
+      font-size:13px;
+    }
+
+    .sale-toggle{
+      border:1px solid #e2b13c;
+      background:#fff8db;
+      color:#8a5a00;
+      border-radius:999px;
+      padding:8px 12px;
+      font-weight:900;
+      cursor:pointer;
+      width:max-content;
+    }
+
+    .sale-toggle.active{
+      background:var(--sale);
+      color:#3b2600;
+      border-color:#d99500;
+    }
+
+    .auth-actions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:6px;
+    }
+
+    .auth-note{
+      margin-top:14px;
+      color:var(--muted);
+      font-size:13px;
+      line-height:1.4;
+      text-align:center;
+    }
+
+    #appShell{display:none}
+
+    .header-card{
+      padding:10px;
+      margin-bottom:14px;
+      border-radius:18px;
+    }
+
+    .tabs{
+      display:flex;
+      gap:0;
+      overflow-x:auto;
+      border:1px solid var(--border);
+      border-radius:14px;
+      background:#f8fbfc;
+    }
+
+    .tab{
+      white-space:nowrap;
+      border:0;
+      border-right:1px solid var(--border);
+      background:#fff;
+      color:var(--text);
+      padding:13px 18px;
+      border-radius:0;
+      font-weight:900;
+      cursor:pointer;
+      min-width:110px;
+    }
+
+    .tab:first-child{
+      border-top-left-radius:13px;
+      border-bottom-left-radius:13px;
+    }
+
+    .tab.active{
+      background:var(--blue);
+      color:#fff;
+    }
+
+    .tab.add{
+      background:#eaf4ec;
+      color:#1f6d35;
+      border-right:0;
+    }
+
+    .panel{
+      padding:18px;
+      margin-bottom:14px;
+    }
+
+    .section-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      margin-bottom:12px;
+    }
+
+    .section-title{
+      font-weight:900;
+      letter-spacing:.08em;
+      font-size:18px;
+      color:#55748e;
+    }
+
+    .list{
+      display:grid;
+      gap:10px;
+    }
+
+    .empty{
+      text-align:center;
+      color:var(--muted);
+      padding:20px 10px;
+      border:1px dashed var(--border);
+      border-radius:18px;
+      background:#fbfdfe;
+    }
+
+    .item{
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:12px;
+      background:#fbfdfe;
+      cursor:pointer;
+      transition:.15s ease;
+    }
+
+    .item:hover{
+      border-color:#b7ceda;
+      transform:translateY(-1px);
+    }
+
+    .item.checked{
+      background:#f0fbf3;
+      border-color:#b8dec3;
+    }
+
+    .item.sale-item{
+      border-color:#e2b13c;
+      background:#fffaf0;
+    }
+
+    .item-top{
+      display:grid;
+      grid-template-columns:46px 1fr;
+      gap:12px;
+      align-items:start;
+    }
+
+    .item-main{min-width:0}
+
+    .item-name{
+      font-weight:900;
+      font-size:16px;
+      word-break:break-word;
+    }
+
+    .item-meta{
+      color:var(--muted);
+      font-size:13px;
+      margin-top:4px;
+      line-height:1.45;
+    }
+
+    .badge{
+      display:inline-block;
+      font-size:11px;
+      font-weight:900;
+      border-radius:999px;
+      padding:4px 8px;
+      margin-left:5px;
+      background:#eef4f7;
+      color:var(--muted);
+    }
+
+    .badge.sale{
+      background:#ffd166;
+      color:#5f3d00;
+    }
+
+    .badge.size{
+      background:#e8f1fb;
+      color:#245f98;
+    }
+
+    .check-btn{
+      min-width:42px;
+      height:42px;
+      border-radius:14px;
+      border:2px solid #b8c9d5;
+      background:#fff;
+      font-size:20px;
+      cursor:pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-shrink:0;
+    }
+
+    .check-btn.checked{
+      background:#e8f4ec;
+      border-color:#7cc28e;
+    }
+
+    .check-btn:disabled{
+      opacity:.45;
+      cursor:not-allowed;
+    }
+
+    .note-box{
+      margin-top:8px;
+      font-size:13px;
+      background:#f7fbfd;
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:8px 10px;
+      color:var(--text);
+      line-height:1.4;
+    }
+
+    .photo-preview{
+      margin-top:10px;
+      max-width:180px;
+      border-radius:14px;
+      border:1px solid var(--border);
+      display:block;
+    }
+
+    .history-item{
+      border:1px solid var(--border);
+      background:#fbfdfe;
+      border-radius:18px;
+      padding:12px;
+    }
+
+    .history-top{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      font-weight:900;
+    }
+
+    .history-meta{
+      color:var(--muted);
+      font-size:13px;
+      margin-top:5px;
+    }
+
+    .history-details{
+      margin-top:10px;
+      font-size:13px;
+      color:var(--text);
+      line-height:1.5;
+    }
+
+    .account-box{
+      padding:14px 16px;
+      color:var(--muted);
+      font-size:13px;
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:20px;
+    }
+
+    .modal{
+      position:fixed;
+      inset:0;
+      background:rgba(20,35,50,.38);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:18px;
+      z-index:50;
+    }
+
+    .modal-card{
+      width:100%;
+      max-width:560px;
+      background:#fff;
+      border-radius:24px;
+      padding:22px;
+      box-shadow:0 20px 60px rgba(20,35,50,.25);
+      max-height:90vh;
+      overflow:auto;
+    }
+
+    .modal-card h2{
+      margin:0 0 18px;
+      text-align:center;
+    }
+
+    .modal-actions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+      margin-top:8px;
+    }
+
+    .edit-extra-actions{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+      margin-top:10px;
+    }
+
+    .receipt-box{
+      background:#fbfdfe;
+      border:1px solid var(--border);
+      border-radius:18px;
+      padding:12px;
+      margin-bottom:14px;
+      font-size:14px;
+      line-height:1.5;
+    }
+
+    .receipt-row{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      border-bottom:1px dashed #d7e2e8;
+      padding:7px 0;
+    }
+
+    .receipt-row:last-child{
+      border-bottom:0;
+    }
+
+    .expense-store-row{
+      margin:10px 0;
+    }
+
+    .expense-line{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      font-size:14px;
+      font-weight:800;
+      margin-bottom:5px;
+    }
+
+    .expense-bar{
+      height:10px;
+      border-radius:999px;
+      background:#e8f1f5;
+      overflow:hidden;
+    }
+
+    .expense-fill{
+      height:100%;
+      background:var(--blue);
+      width:0%;
+    }
+
+    .bottom-bar{
+      position:fixed;
+      left:0;
+      right:0;
+      bottom:0;
+      background:rgba(238,245,247,.96);
+      backdrop-filter:blur(10px);
+      border-top:1px solid var(--border);
+      padding:10px 14px;
+      z-index:20;
+    }
+
+    .bottom-inner{
+      max-width:900px;
+      margin:0 auto;
+      display:grid;
+      grid-template-columns:1fr auto auto auto auto;
+      gap:10px;
+      align-items:center;
+    }
+
+    .bottom-buttons{
+      display:flex;
+      gap:8px;
+      align-items:center;
+    }
+
+    .total-box{
+      background:#fff;
+      border:1px solid var(--border);
+      box-shadow:var(--shadow);
+      border-radius:18px;
+      padding:10px 14px;
+    }
+
+    .total-label{
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.1em;
+      color:#7e4b65;
+    }
+
+    .total-value{
+      font-size:18px;
+      font-weight:900;
+      color:#7e173f;
+    }
+
+    .suggestions{
+      margin-top:8px;
+      border:3px solid #ffb703;
+      border-radius:14px;
+      overflow:hidden;
+      background:#fff8d6;
+      box-shadow:0 10px 25px rgba(180,120,0,.18);
+    }
+
+    .suggestion{
+      padding:12px;
+      cursor:pointer;
+      border-bottom:1px solid #e5c560;
+      font-size:14px;
+      background:#fff8d6;
+    }
+
+    .suggestion:last-child{border-bottom:0}
+    .suggestion:hover{background:#ffe08a}
+
+    .suggestion strong{color:#5f3d00}
+
+    .suggestion span{
+      display:block;
+      margin-top:3px;
+      color:#795700;
+      font-size:12px;
+      font-weight:700;
+    }
+
+
+    .theme-btn{
+      width:38px;
+      height:38px;
+      border-radius:999px;
+      padding:0;
+      font-size:17px;
+    }
+
+    body.dark .btn-ghost{background:#1c2b3a}
+    body.dark .card,
+    body.dark .modal-card,
+    body.dark .total-box{background:var(--card)}
+    body.dark .field input,
+    body.dark .field select,
+    body.dark .field textarea{
+      background:#0f1924;
+      border-color:#3a5166;
+      color:#e8f1f7;
+    }
+    body.dark .bottom-bar{background:rgba(16,25,35,.96)}
+
+    .item.need-item{background:var(--get-bg);border-color:var(--get-border)}
+    .item.got-item{background:var(--got-bg);border-color:var(--got-border)}
+    .item.saved-item{background:var(--saved-bg);border-color:var(--saved-border)}
+    .item.future-item{background:var(--future-bg);border-color:var(--future-border)}
+    .item.need-item.expanded{background:var(--get-open)}
+    .item.got-item.expanded{background:var(--got-open)}
+    .item.saved-item.expanded{background:var(--saved-open)}
+    .item.future-item.expanded{background:var(--future-open)}
+    .item.expanded{box-shadow:0 0 0 3px rgba(47,115,183,.12), var(--shadow)}
+
+    .item-expand{
+      margin-top:12px;
+      padding:12px;
+      border-radius:18px;
+      border:2px solid var(--detail-border);
+      background:var(--detail-bg);
+      cursor:default;
+    }
+
+    .quick-edit-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:10px;
+    }
+
+    .mini-field label{
+      display:block;
+      font-size:10px;
+      font-weight:900;
+      color:var(--muted);
+      letter-spacing:.08em;
+      margin-bottom:4px;
+    }
+
+    .mini-field input,
+    .mini-field textarea{
+      width:100%;
+      border:1px solid var(--border);
+      border-radius:12px;
+      padding:10px;
+      font-size:14px;
+      background:#fff;
+      color:#27435a;
+      outline:none;
+      font-family:inherit;
+    }
+
+    body.dark .mini-field input,
+    body.dark .mini-field textarea{
+      background:#0f1924;
+      color:#e8f1f7;
+      border-color:#3a5166;
+    }
+
+    .mini-field textarea{
+      min-height:70px;
+      resize:vertical;
+    }
+
+    .quick-note{grid-column:1 / -1}
+
+    .quick-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+
+    .chip{
+      font-size:12px;
+      padding:8px 10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:#fff;
+      cursor:pointer;
+      font-weight:800;
+      color:var(--text);
+    }
+
+    body.dark .chip{background:#172332}
+
+    @media (max-width:700px){
+      .wrap{
+        padding:12px 10px 215px;
+      }
+
+      .auth-actions,
+      .modal-actions,
+      .edit-extra-actions{
+        grid-template-columns:1fr;
+      }
+
+      .bottom-inner{
+        grid-template-columns:1fr 1fr;
+        gap:8px;
+      }
+
+      .total-box{
+        grid-column:1 / -1;
+        padding:8px 12px;
+      }
+
+      .bottom-inner .btn{
+        padding:9px 8px;
+        font-size:13px;
+        border-radius:13px;
+      }
+
+      .account-box{
+        margin-bottom:35px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <div class="wrap">
+    <div id="authScreen" class="card auth-card">
+      <h1 class="auth-title">GROCERY APP</h1>
+      <p class="auth-sub">Sign in with email and password to open your grocery list.</p>
+
+      <div id="authError" class="error-box"></div>
+
+      <div class="field">
+        <label for="emailInput">EMAIL</label>
+        <input id="emailInput" type="email" placeholder="you@example.com" autocomplete="username" />
+      </div>
+
+      <div class="field">
+        <label for="passwordInput">PASSWORD</label>
+        <input id="passwordInput" type="password" placeholder="Enter password" autocomplete="current-password" />
+      </div>
+
+      <div class="auth-actions">
+        <button id="signInBtn" class="btn btn-primary">Sign In</button>
+        <button id="createAccountBtn" class="btn btn-ghost">Create Account</button>
+      </div>
+
+      <p class="auth-note">First time? Use <b>Create Account</b> once, then later use <b>Sign In</b>.</p>
+    </div>
+
+    <div id="appShell">
+      <div class="card header-card">
+        <div id="storeTabs" class="tabs"></div>
+      </div>
+
+      <div class="card panel">
+        <div class="section-head">
+          <div class="section-title">GET</div>
+        </div>
+        <div id="needList" class="list"></div>
+      </div>
+
+      <div class="card panel">
+        <div class="section-head">
+          <div class="section-title">GOT</div>
+          <div id="gotCount" style="color:var(--muted);font-weight:800;">0 items</div>
+        </div>
+        <div id="gotList" class="list"></div>
+      </div>
+
+      <div class="card panel">
+        <div class="section-head">
+          <div>
+            <div class="section-title">SAVED ITEMS</div>
+            <div id="savedCount" style="color:var(--muted);font-size:13px;margin-top:3px;">0 items</div>
+          </div>
+          <button id="toggleSavedBtn" class="btn btn-ghost btn-small">Show / Hide</button>
+        </div>
+        <div id="savedWrap" class="hidden">
+          <div id="savedList" class="list"></div>
+        </div>
+      </div>
+
+      <div class="card panel">
+        <div class="section-head">
+          <div>
+            <div class="section-title">FUTURE LIST</div>
+            <div id="futureCount" style="color:var(--muted);font-size:13px;margin-top:3px;">0 items</div>
+          </div>
+          <button id="toggleFutureBtn" class="btn btn-ghost btn-small">Show / Hide</button>
+        </div>
+        <div id="futureWrap" class="hidden">
+          <div id="futureList" class="list"></div>
+        </div>
+      </div>
+
+      <div class="card panel">
+        <div class="section-head">
+          <div class="section-title">SHOPPING HISTORY</div>
+          <button id="toggleHistoryBtn" class="btn btn-ghost btn-small">Show / Hide</button>
+        </div>
+        <div id="historyWrap" class="hidden">
+          <div id="historyList" class="list"></div>
+        </div>
+      </div>
+
+      <div class="card account-box">
+        <div id="accountText">Account</div>
+        <button id="signOutBtn" class="btn btn-ghost btn-small">Sign Out</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="bottomBar" class="bottom-bar hidden">
+    <div class="bottom-inner">
+      <div class="total-box">
+        <div class="total-label">ROUGH RECEIPT TOTAL</div>
+        <div id="pickedTotalBottom" class="total-value">$0.00</div>
+      </div>
+      <button id="bottomAddBtn" class="btn btn-green">+ Add</button>
+      <button id="expenseBtn" class="btn btn-ghost">Expense</button>
+      <button id="finishShoppingBtn" class="btn btn-primary">Finish</button>
+      <button id="themeToggleBtn" class="btn btn-ghost theme-btn" title="Toggle theme">◐</button>
+    </div>
+  </div>
+
+  <div id="addModal" class="modal hidden">
+    <div class="modal-card">
+      <h2 id="itemModalTitle">Add Item</h2>
+
+      <div class="field">
+        <label for="itemNameInput">ITEM NAME</label>
+        <input id="itemNameInput" type="text" placeholder="Milk, eggs, rice..." />
+        <div id="suggestionsBox" class="suggestions hidden"></div>
+      </div>
+
+      <div class="field">
+        <label for="itemQtyInput">NUMBER NEEDED</label>
+        <input id="itemQtyInput" type="number" min="1" value="1" />
+      </div>
+
+      <div class="field">
+        <label for="itemSizeInput">SIZE</label>
+        <input id="itemSizeInput" type="text" placeholder="Small, large, 12 oz, 1 gallon..." />
+      </div>
+
+      <div class="field">
+        <label for="itemPriceInput">PRICE OPTIONAL</label>
+        <input id="itemPriceInput" type="text" placeholder="Optional now, example: 9.99 or 9.99 for 2" />
+      </div>
+
+      <div class="field">
+        <label for="itemNoteInput">FREE TEXT / NOTE</label>
+        <textarea id="itemNoteInput" placeholder="Any reminder, brand, flavor, aisle, etc."></textarea>
+      </div>
+
+      <div class="field">
+        <label for="itemPhotoInput">PHOTO REFERENCE URL OPTIONAL</label>
+        <input id="itemPhotoInput" type="text" placeholder="Paste image URL if needed" />
+      </div>
+
+      <div class="field">
+        <label for="itemStoreInput">STORE</label>
+        <select id="itemStoreInput"></select>
+      </div>
+
+      <button id="saleToggleBtn" type="button" class="sale-toggle">Sale: Off</button>
+
+      <div id="editExtraActions" class="edit-extra-actions hidden">
+        <button id="moveNeedBtn" type="button" class="btn btn-ghost btn-small">Move to Get</button>
+        <button id="moveFutureBtn" type="button" class="btn btn-ghost btn-small">Move to Future</button>
+        <button id="moveSavedBtn" type="button" class="btn btn-ghost btn-small">Move to Saved</button>
+        <button id="deleteItemBtn" type="button" class="btn btn-danger btn-small">Delete Item</button>
+      </div>
+
+      <div class="modal-actions">
+        <button id="saveModalItemBtn" class="btn btn-green">Save Item</button>
+        <button id="closeModalBtn" class="btn btn-ghost">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="expenseModal" class="modal hidden">
+    <div class="modal-card">
+      <h2>Expense</h2>
+      <div id="expenseContent"></div>
+      <div class="modal-actions">
+        <button id="closeExpenseBtn" class="btn btn-primary">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="finishModal" class="modal hidden">
+    <div class="modal-card">
+      <h2>Finish Shopping</h2>
+
+      <div id="finishReceiptPreview" class="receipt-box"></div>
+
+      <div class="field">
+        <label for="actualTotalInput">ACTUAL CHECKOUT TOTAL OPTIONAL</label>
+        <input id="actualTotalInput" type="number" step="0.01" placeholder="Enter total from store receipt" />
+      </div>
+
+      <div class="receipt-box">
+        <b>No receipt photo needed.</b><br>
+        Enter the real checkout total below. The app will save both the rough estimate and the actual receipt total in Firestore.
+      </div>
+
+      <div class="field">
+        <label for="receiptNoteInput">RECEIPT NOTE OPTIONAL</label>
+        <textarea id="receiptNoteInput" placeholder="Anything to remember about this trip..."></textarea>
+      </div>
+
+      <div class="modal-actions">
+        <button id="saveReceiptBtn" class="btn btn-green">Save Receipt</button>
+        <button id="closeFinishBtn" class="btn btn-ghost">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import {
+      getAuth,
+      onAuthStateChanged,
+      signInWithEmailAndPassword,
+      createUserWithEmailAndPassword,
+      signOut
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+
+    import {
+      getFirestore,
+      collection,
+      addDoc,
+      onSnapshot,
+      updateDoc,
+      deleteDoc,
+      doc,
+      query,
+      orderBy,
+      serverTimestamp,
+      writeBatch
+    } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyCKjRp3Cznv-kpLmV_jTMWPLbxholG8_t0",
+      authDomain: "grocery-tracker-ac17b.firebaseapp.com",
+      projectId: "grocery-tracker-ac17b",
+      storageBucket: "grocery-tracker-ac17b.firebasestorage.app",
+      messagingSenderId: "1093457578265",
+      appId: "1:1093457578265:web:f4a65515ce8d671a1f1d88"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    const DEFAULT_STORES = ["Costco", "ShopRite"];
+
+    const authScreen = document.getElementById("authScreen");
+    const appShell = document.getElementById("appShell");
+    const bottomBar = document.getElementById("bottomBar");
+    const accountText = document.getElementById("accountText");
+    const authError = document.getElementById("authError");
+
+    const emailInput = document.getElementById("emailInput");
+    const passwordInput = document.getElementById("passwordInput");
+    const signInBtn = document.getElementById("signInBtn");
+    const createAccountBtn = document.getElementById("createAccountBtn");
+    const signOutBtn = document.getElementById("signOutBtn");
+
+    const storeTabs = document.getElementById("storeTabs");
+
+    const needList = document.getElementById("needList");
+    const gotList = document.getElementById("gotList");
+    const savedList = document.getElementById("savedList");
+    const futureList = document.getElementById("futureList");
+    const historyList = document.getElementById("historyList");
+
+    const savedWrap = document.getElementById("savedWrap");
+    const futureWrap = document.getElementById("futureWrap");
+    const historyWrap = document.getElementById("historyWrap");
+
+    const toggleSavedBtn = document.getElementById("toggleSavedBtn");
+    const toggleFutureBtn = document.getElementById("toggleFutureBtn");
+    const toggleHistoryBtn = document.getElementById("toggleHistoryBtn");
+
+    const savedCount = document.getElementById("savedCount");
+    const futureCount = document.getElementById("futureCount");
+    const gotCount = document.getElementById("gotCount");
+    const pickedTotalBottom = document.getElementById("pickedTotalBottom");
+
+    const bottomAddBtn = document.getElementById("bottomAddBtn");
+    const expenseBtn = document.getElementById("expenseBtn");
+    const finishShoppingBtn = document.getElementById("finishShoppingBtn");
+    const themeToggleBtn = document.getElementById("themeToggleBtn");
+
+    const addModal = document.getElementById("addModal");
+    const itemModalTitle = document.getElementById("itemModalTitle");
+    const itemNameInput = document.getElementById("itemNameInput");
+    const itemQtyInput = document.getElementById("itemQtyInput");
+    const itemSizeInput = document.getElementById("itemSizeInput");
+    const itemPriceInput = document.getElementById("itemPriceInput");
+    const itemNoteInput = document.getElementById("itemNoteInput");
+    const itemPhotoInput = document.getElementById("itemPhotoInput");
+    const itemStoreInput = document.getElementById("itemStoreInput");
+    const saleToggleBtn = document.getElementById("saleToggleBtn");
+    const suggestionsBox = document.getElementById("suggestionsBox");
+    const saveModalItemBtn = document.getElementById("saveModalItemBtn");
+    const closeModalBtn = document.getElementById("closeModalBtn");
+    const editExtraActions = document.getElementById("editExtraActions");
+    const moveNeedBtn = document.getElementById("moveNeedBtn");
+    const moveFutureBtn = document.getElementById("moveFutureBtn");
+    const moveSavedBtn = document.getElementById("moveSavedBtn");
+    const deleteItemBtn = document.getElementById("deleteItemBtn");
+
+    const expenseModal = document.getElementById("expenseModal");
+    const expenseContent = document.getElementById("expenseContent");
+    const closeExpenseBtn = document.getElementById("closeExpenseBtn");
+
+    const finishModal = document.getElementById("finishModal");
+    const finishReceiptPreview = document.getElementById("finishReceiptPreview");
+    const actualTotalInput = document.getElementById("actualTotalInput");
+    const receiptNoteInput = document.getElementById("receiptNoteInput");
+    const saveReceiptBtn = document.getElementById("saveReceiptBtn");
+    const closeFinishBtn = document.getElementById("closeFinishBtn");
+
+    let currentUser = null;
+    let currentItems = [];
+    let receipts = [];
+    let stores = [...DEFAULT_STORES];
+    let selectedStore = "Costco";
+    let editingItemId = null;
+    let expandedItemId = null;
+    let modalSale = false;
+    let unsubscribeItems = null;
+    let unsubscribeReceipts = null;
+
+    function applyInitialTheme(){
+      const savedTheme = localStorage.getItem("groceryTheme");
+      if(savedTheme === "dark" || savedTheme === "light"){
+        document.body.classList.toggle("dark", savedTheme === "dark");
+      }else{
+        const hour = new Date().getHours();
+        document.body.classList.toggle("dark", hour >= 19 || hour < 7);
+      }
+      updateThemeButton();
+    }
+
+    function updateThemeButton(){
+      if(themeToggleBtn){
+        themeToggleBtn.textContent = document.body.classList.contains("dark") ? "☀️" : "🌙";
+      }
+    }
+
+    function toggleTheme(){
+      document.body.classList.toggle("dark");
+      localStorage.setItem("groceryTheme", document.body.classList.contains("dark") ? "dark" : "light");
+      updateThemeButton();
+    }
+
+    function showError(message){
+      authError.textContent = message;
+      authError.style.display = "block";
+    }
+
+    function clearError(){
+      authError.textContent = "";
+      authError.style.display = "none";
+    }
+
+    function setAuthLoading(loading){
+      signInBtn.disabled = loading;
+      createAccountBtn.disabled = loading;
+      signInBtn.textContent = loading ? "Please wait..." : "Sign In";
+      createAccountBtn.textContent = loading ? "Please wait..." : "Create Account";
+    }
+
+    function escapeHtml(str){
+      return String(str ?? "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#039;");
+    }
+
+    function money(value){
+      return `$${Number(value || 0).toFixed(2)}`;
+    }
+
+    function parsePriceNumber(priceText){
+      if(!priceText) return 0;
+      const cleaned = String(priceText).trim();
+
+      const forMatch = cleaned.match(/^(\d+(\.\d+)?)\s*(for|\/)\s*(\d+(\.\d+)?)$/i);
+      if(forMatch){
+        const total = parseFloat(forMatch[1]);
+        return isNaN(total) ? 0 : total;
+      }
+
+      const numberMatch = cleaned.match(/(\d+(\.\d+)?)/);
+      if(!numberMatch) return 0;
+
+      const value = parseFloat(numberMatch[1]);
+      return isNaN(value) ? 0 : value;
+    }
+
+    function itemTotal(item){
+      return parsePriceNumber(item.price) * (Number(item.quantity) || 1);
+    }
+
+    function totalQuantity(items){
+      return items.reduce((sum,item) => sum + (Number(item.quantity) || 1), 0);
+    }
+
+    function normalizeStoreName(name){
+      return String(name || "").trim();
+    }
+
+    function setSaleButton(){
+      saleToggleBtn.textContent = modalSale ? "Sale: On" : "Sale: Off";
+      saleToggleBtn.classList.toggle("active", modalSale);
+    }
+
+    function openAddModal(sourceItem = null){
+      editingItemId = sourceItem?.id || null;
+      itemModalTitle.textContent = editingItemId ? "Full Edit Item" : "Add Item";
+      saveModalItemBtn.textContent = editingItemId ? "Save Full Edit" : "Save Item";
+      editExtraActions.classList.toggle("hidden", !editingItemId);
+
+      itemNameInput.value = sourceItem?.name || "";
+      itemQtyInput.value = sourceItem?.quantity || "1";
+      itemSizeInput.value = sourceItem?.size || "";
+      itemPriceInput.value = sourceItem?.price || "";
+      itemNoteInput.value = sourceItem?.note || "";
+      itemPhotoInput.value = sourceItem?.photoUrl || "";
+      itemStoreInput.value = sourceItem?.store || selectedStore;
+      modalSale = !!sourceItem?.sale;
+      setSaleButton();
+      suggestionsBox.classList.add("hidden");
+      addModal.classList.remove("hidden");
+      setTimeout(() => itemNameInput.focus(), 50);
+    }
+
+    function closeAddModal(){
+      addModal.classList.add("hidden");
+      editingItemId = null;
+      suggestionsBox.classList.add("hidden");
+      editExtraActions.classList.add("hidden");
+    }
+
+    async function handleSignIn(){
+      clearError();
+      const email = emailInput.value.trim();
+      const password = passwordInput.value.trim();
+
+      if(!email || !password){
+        showError("Enter email and password.");
+        return;
+      }
+
+      try{
+        setAuthLoading(true);
+        await signInWithEmailAndPassword(auth,email,password);
+      }catch(err){
+        showError(err.message);
+        console.error(err);
+      }finally{
+        setAuthLoading(false);
+      }
+    }
+
+    async function handleCreateAccount(){
+      clearError();
+      const email = emailInput.value.trim();
+      const password = passwordInput.value.trim();
+
+      if(!email || !password){
+        showError("Enter email and password.");
+        return;
+      }
+
+      if(password.length < 6){
+        showError("Password should be at least 6 characters.");
+        return;
+      }
+
+      try{
+        setAuthLoading(true);
+        await createUserWithEmailAndPassword(auth,email,password);
+      }catch(err){
+        showError(err.message);
+        console.error(err);
+      }finally{
+        setAuthLoading(false);
+      }
+    }
+
+    async function handleSignOut(){
+      try{
+        await signOut(auth);
+      }catch(err){
+        alert(err.message);
+        console.error(err);
+      }
+    }
+
+    function renderStoreTabs(){
+      const itemStores = currentItems.map(i => i.store).filter(Boolean);
+      const receiptStores = receipts.map(r => r.store).filter(Boolean);
+      stores = Array.from(new Set([...DEFAULT_STORES,...stores,...itemStores,...receiptStores]));
+
+      if(!stores.includes(selectedStore)) selectedStore = stores[0] || "Costco";
+
+      storeTabs.innerHTML = "";
+
+      stores.forEach(store => {
+        const btn = document.createElement("button");
+        btn.className = `tab ${store === selectedStore ? "active" : ""}`;
+        btn.textContent = store;
+        btn.addEventListener("click", () => {
+          selectedStore = store;
+          expandedItemId = null;
+          renderAll();
+        });
+        storeTabs.appendChild(btn);
+      });
+
+      const addBtn = document.createElement("button");
+      addBtn.className = "tab add";
+      addBtn.textContent = "+ Add Store";
+      addBtn.addEventListener("click", () => {
+        const storeName = normalizeStoreName(prompt("New store name:"));
+        if(!storeName) return;
+        stores.push(storeName);
+        selectedStore = storeName;
+        expandedItemId = null;
+        renderAll();
+      });
+      storeTabs.appendChild(addBtn);
+
+      itemStoreInput.innerHTML = "";
+      stores.forEach(store => {
+        const opt = document.createElement("option");
+        opt.value = store;
+        opt.textContent = store;
+        itemStoreInput.appendChild(opt);
+      });
+    }
+
+    function renderAll(){
+      renderStoreTabs();
+      renderItems();
+      renderHistory();
+    }
+
+    function renderItems(){
+      needList.innerHTML = "";
+      gotList.innerHTML = "";
+      savedList.innerHTML = "";
+      futureList.innerHTML = "";
+
+      const visibleItems = currentItems.filter(i => (i.store || "Costco") === selectedStore);
+      const need = visibleItems.filter(i => i.status === "need");
+      const got = visibleItems.filter(i => i.status === "got");
+      const saved = visibleItems.filter(i => i.status === "saved");
+      const future = visibleItems.filter(i => i.status === "future");
+
+      if(!need.length){
+        needList.innerHTML = `<div class="empty">No items to buy for ${escapeHtml(selectedStore)}.</div>`;
+      }else{
+        need.forEach(item => needList.appendChild(buildItemCard(item)));
+      }
+
+      if(!got.length){
+        gotList.innerHTML = `<div class="empty">No picked items yet.</div>`;
+      }else{
+        got.forEach(item => gotList.appendChild(buildItemCard(item)));
+      }
+
+      if(!saved.length){
+        savedList.innerHTML = `<div class="empty">No saved items for ${escapeHtml(selectedStore)}.</div>`;
+      }else{
+        saved.forEach(item => savedList.appendChild(buildItemCard(item)));
+      }
+
+      if(!future.length){
+        futureList.innerHTML = `<div class="empty">No future items for ${escapeHtml(selectedStore)}.</div>`;
+      }else{
+        future.forEach(item => futureList.appendChild(buildItemCard(item)));
+      }
+
+      const total = got.reduce((sum,item) => sum + itemTotal(item), 0);
+      pickedTotalBottom.textContent = money(total);
+
+      gotCount.textContent = `${totalQuantity(got)} item${totalQuantity(got) === 1 ? "" : "s"}`;
+      savedCount.textContent = `${totalQuantity(saved)} item${totalQuantity(saved) === 1 ? "" : "s"}`;
+      futureCount.textContent = `${totalQuantity(future)} item${totalQuantity(future) === 1 ? "" : "s"}`;
+    }
+
+    function statusClass(status){
+      if(status === "got") return "got-item";
+      if(status === "saved") return "saved-item";
+      if(status === "future") return "future-item";
+      return "need-item";
+    }
+
+    function statusLabel(status){
+      if(status === "got") return "Got";
+      if(status === "saved") return "Saved";
+      if(status === "future") return "Future";
+      return "Get";
+    }
+
+    function buildItemCard(item){
+      const div = document.createElement("div");
+      const expanded = expandedItemId === item.id;
+      div.className = `item ${statusClass(item.status)} ${expanded ? "expanded" : ""}`;
+
+      const total = itemTotal(item);
+      const isSaved = item.status === "saved";
+      const isFuture = item.status === "future";
+      const checkAction = item.status === "got" ? "need" : "got";
+      const checkDisabled = isSaved || isFuture;
+
+      div.innerHTML = `
+        <div class="item-top">
+          <button class="check-btn ${item.status === "got" ? "checked" : ""}" ${checkDisabled ? "disabled" : ""} data-action="${checkAction}">
+            ${item.status === "got" ? "✓" : ""}
+          </button>
+
+          <div class="item-main">
+            <div class="item-name">
+              ${escapeHtml(item.name || "Untitled item")} × ${item.quantity || 1}
+              <span class="badge">${statusLabel(item.status)}</span>
+              ${item.sale ? `<span class="badge sale">SALE</span>` : ""}
+              ${item.size ? `<span class="badge size">${escapeHtml(item.size)}</span>` : ""}
+            </div>
+
+            <div class="item-meta">
+              ${item.price ? `Price: ${escapeHtml(item.price)}` : "Price not added yet"}
+              ${total ? ` • Rough total: ${money(total)}` : ""}
+            </div>
+
+            ${item.note ? `<div class="note-box">${escapeHtml(item.note)}</div>` : ""}
+          </div>
+        </div>
+
+        ${expanded ? buildExpandedItemHtml(item) : ""}
+      `;
+
+      div.addEventListener("click", () => {
+        expandedItemId = expanded ? null : item.id;
+        renderItems();
+      });
+
+      div.querySelector("[data-action]")?.addEventListener("click", async e => {
+        e.stopPropagation();
+        const action = e.currentTarget.dataset.action;
+        const ref = doc(db,"groceryItems",item.id);
+
+        try{
+          await updateDoc(ref,{ status: action });
+        }catch(err){
+          alert(err.message);
+          console.error(err);
+        }
+      });
+
+      if(expanded){
+        wireExpandedItem(div,item);
+      }
+
+      return div;
+    }
+
+    function buildExpandedItemHtml(item){
+      const canCheck = !["saved","future"].includes(item.status);
+      return `
+        <div class="item-expand" onclick="event.stopPropagation()">
+          <div class="quick-edit-grid">
+            <div class="mini-field">
+              <label>QUANTITY</label>
+              <input class="quick-qty" type="number" min="1" value="${item.quantity || 1}" />
+            </div>
+
+            <div class="mini-field">
+              <label>PRICE</label>
+              <input class="quick-price" type="text" value="${escapeHtml(item.price || "")}" placeholder="9.99 or 9.99 for 2" />
+            </div>
+
+            <div class="mini-field quick-note">
+              <label>FREE TEXT / NOTE</label>
+              <textarea class="quick-note-input" placeholder="Brand, reminder, aisle, etc.">${escapeHtml(item.note || "")}</textarea>
+            </div>
+          </div>
+
+          ${item.photoUrl ? `<img class="photo-preview" src="${escapeHtml(item.photoUrl)}" alt="Item reference photo" />` : ""}
+
+          <div class="quick-actions">
+            ${item.status !== "need" ? `<button class="chip" data-quick="need">Move to Get</button>` : ""}
+            ${item.status !== "got" && canCheck ? `<button class="chip" data-quick="got">Move to Got</button>` : ""}
+            ${item.status !== "future" ? `<button class="chip" data-quick="future">Move to Future</button>` : ""}
+            ${item.status !== "saved" ? `<button class="chip" data-quick="saved">Move to Saved</button>` : ""}
+            <button class="chip" data-quick="sale">${item.sale ? "Sale On" : "Sale Off"}</button>
+            <button class="chip" data-quick="fullEdit">Edit</button>
+          </div>
+        </div>
+      `;
+    }
+
+    function wireExpandedItem(div,item){
+      const qty = div.querySelector(".quick-qty");
+      const price = div.querySelector(".quick-price");
+      const note = div.querySelector(".quick-note-input");
+
+      let saveTimer = null;
+
+      function scheduleSave(){
+        clearTimeout(saveTimer);
+        saveTimer = setTimeout(saveQuickEdits, 550);
+      }
+
+      async function saveQuickEdits(){
+        try{
+          await updateDoc(doc(db,"groceryItems",item.id),{
+            quantity: parseInt(qty.value,10) || 1,
+            price: price.value.trim(),
+            note: note.value.trim()
+          });
+        }catch(err){
+          alert(err.message);
+          console.error(err);
+        }
+      }
+
+      [qty,price,note].forEach(input => {
+        input.addEventListener("input",scheduleSave);
+        input.addEventListener("change",saveQuickEdits);
+        input.addEventListener("click", e => e.stopPropagation());
+      });
+
+      div.querySelectorAll("[data-quick]").forEach(btn => {
+        btn.addEventListener("click", async e => {
+          e.stopPropagation();
+          const action = btn.dataset.quick;
+
+          try{
+            if(action === "fullEdit"){
+              openAddModal(item);
+            }else if(action === "sale"){
+              await updateDoc(doc(db,"groceryItems",item.id),{ sale: !item.sale });
+            }else{
+              await updateDoc(doc(db,"groceryItems",item.id),{ status: action });
+              expandedItemId = null;
+            }
+          }catch(err){
+            alert(err.message);
+            console.error(err);
+          }
+        });
+      });
+    }
+
+    async function updateEditingItemStatus(status){
+      if(!editingItemId) return;
+      try{
+        await updateDoc(doc(db,"groceryItems",editingItemId),{ status });
+        closeAddModal();
+      }catch(err){
+        alert(err.message);
+        console.error(err);
+      }
+    }
+
+    async function deleteEditingItem(){
+      if(!editingItemId) return;
+      const item = currentItems.find(i => i.id === editingItemId);
+      if(!confirm(`Delete ${item?.name || "this item"}?`)) return;
+
+      try{
+        await deleteDoc(doc(db,"groceryItems",editingItemId));
+        closeAddModal();
+      }catch(err){
+        alert(err.message);
+        console.error(err);
+      }
+    }
+
+    async function handleAddItem(){
+      if(!currentUser){
+        alert("Please sign in first.");
+        return;
+      }
+
+      const name = itemNameInput.value.trim();
+      const quantity = parseInt(itemQtyInput.value,10) || 1;
+      const size = itemSizeInput.value.trim();
+      const price = itemPriceInput.value.trim();
+      const note = itemNoteInput.value.trim();
+      const photoUrl = itemPhotoInput.value.trim();
+      const store = itemStoreInput.value || selectedStore;
+
+      if(!name){
+        alert("Enter an item name.");
+        itemNameInput.focus();
+        return;
+      }
+
+      try{
+        if(editingItemId){
+          const ref = doc(db,"groceryItems",editingItemId);
+          await updateDoc(ref,{
+            name,
+            quantity,
+            size,
+            price,
+            note,
+            photoUrl,
+            sale: modalSale,
+            store
+          });
+        }else{
+          const sameActive = currentItems.find(i =>
+            (i.store || "Costco") === store &&
+            ["need","got"].includes(i.status) &&
+            String(i.name || "").toLowerCase() === name.toLowerCase() &&
+            String(i.size || "").toLowerCase() === size.toLowerCase()
+          );
+
+          if(sameActive){
+            const ok = confirm(`${name}${size ? " (" + size + ")" : ""} is already on the current list for ${store}. Update quantity/price instead?`);
+            if(ok){
+              const ref = doc(db,"groceryItems",sameActive.id);
+              await updateDoc(ref,{
+                quantity,
+                size,
+                price,
+                note,
+                photoUrl,
+                sale: modalSale,
+                status:"need"
+              });
+            }else{
+              return;
+            }
+          }else{
+            await addDoc(collection(db,"groceryItems"),{
+              name,
+              quantity,
+              size,
+              price,
+              note,
+              photoUrl,
+              sale: modalSale,
+              store,
+              status:"need",
+              createdBy: currentUser.email || currentUser.uid,
+              createdAt: serverTimestamp()
+            });
+          }
+        }
+
+        selectedStore = store;
+        closeAddModal();
+      }catch(err){
+        alert(err.message);
+        console.error(err);
+      }
+    }
+
+    function getPickedItems(){
+      return currentItems.filter(i => (i.store || "Costco") === selectedStore && i.status === "got");
+    }
+
+    function buildEstimatedReceiptHtml(gotItems){
+      const total = gotItems.reduce((sum,item) => sum + itemTotal(item),0);
+
+      const rows = gotItems.map(item => `
+        <div class="receipt-row">
+          <div>
+            <b>${escapeHtml(item.name || "")}</b>
+            <div style="color:var(--muted);font-size:12px;">
+              Qty ${item.quantity || 1}${item.size ? ` • ${escapeHtml(item.size)}` : ""}${item.sale ? " • SALE" : ""}
+            </div>
+          </div>
+          <div>${money(itemTotal(item))}</div>
+        </div>
+      `).join("");
+
+      return `
+        <div style="font-weight:900;margin-bottom:8px;">Estimated in-app receipt for ${escapeHtml(selectedStore)}</div>
+        ${rows}
+        <div class="receipt-row" style="font-weight:900;font-size:16px;margin-top:8px;">
+          <div>Rough estimated total</div>
+          <div>${money(total)}</div>
+        </div>
+      `;
+    }
+
+    function openFinishModal(){
+      if(!currentUser){
+        alert("Please sign in first.");
+        return;
+      }
+
+      const gotItems = getPickedItems();
+
+      if(!gotItems.length){
+        alert("No checked items to save for this store.");
+        return;
+      }
+
+      finishReceiptPreview.innerHTML = buildEstimatedReceiptHtml(gotItems);
+      actualTotalInput.value = "";
+      receiptNoteInput.value = "";
+      finishModal.classList.remove("hidden");
+    }
+
+    async function saveReceipt(){
+      if(!currentUser){
+        alert("Please sign in first.");
+        return;
+      }
+
+      const gotItems = getPickedItems();
+
+      if(!gotItems.length){
+        alert("No checked items to save for this store.");
+        return;
+      }
+
+      const estimatedTotal = gotItems.reduce((sum,item) => sum + itemTotal(item),0);
+      const actualTotal = actualTotalInput.value ? Number(actualTotalInput.value) : null;
+      const count = totalQuantity(gotItems);
+      const note = receiptNoteInput.value.trim();
+
+      saveReceiptBtn.disabled = true;
+      saveReceiptBtn.textContent = "Saving...";
+
+      try{
+
+        await addDoc(collection(db,"receipts"),{
+          store:selectedStore,
+          estimatedTotal,
+          actualTotal,
+          total: actualTotal ?? estimatedTotal,
+          itemCount:count,
+          note,
+          items:gotItems.map(item => ({
+            name:item.name || "",
+            quantity:item.quantity || 1,
+            size:item.size || "",
+            price:item.price || "",
+            note:item.note || "",
+            sale:!!item.sale,
+            total:itemTotal(item)
+          })),
+          createdBy:currentUser.email || currentUser.uid,
+          createdAt:serverTimestamp(),
+          createdAtText:new Date().toISOString()
+        });
+
+        const batch = writeBatch(db);
+        gotItems.forEach(item => {
+          const ref = doc(db,"groceryItems",item.id);
+          batch.update(ref,{ status:"saved" });
+        });
+        await batch.commit();
+
+        finishModal.classList.add("hidden");
+        alert("Receipt saved. Picked items moved to Saved.");
+      }catch(err){
+        alert(err.message);
+        console.error(err);
+      }finally{
+        saveReceiptBtn.disabled = false;
+        saveReceiptBtn.textContent = "Save Receipt";
+      }
+    }
+
+    function getReceiptDate(receipt){
+      if(receipt.createdAt?.toDate) return receipt.createdAt.toDate();
+      if(receipt.createdAtText) return new Date(receipt.createdAtText);
+      return null;
+    }
+
+    function openExpenseModal(){
+      const now = new Date();
+      const month = now.getMonth();
+      const year = now.getFullYear();
+
+      let monthly = 0;
+      let annual = 0;
+      const storeTotals = {};
+
+      receipts.forEach(receipt => {
+        const date = getReceiptDate(receipt);
+        if(!date || isNaN(date)) return;
+
+        const total = Number(receipt.total ?? receipt.actualTotal ?? receipt.estimatedTotal ?? 0);
+        const store = receipt.store || "Unknown";
+
+        if(date.getFullYear() === year){
+          annual += total;
+
+          if(date.getMonth() === month){
+            monthly += total;
+            storeTotals[store] = (storeTotals[store] || 0) + total;
+          }
+        }
+      });
+
+      const storeRows = Object.entries(storeTotals)
+        .sort((a,b) => b[1] - a[1])
+        .map(([store,total]) => {
+          const percent = monthly ? (total / monthly) * 100 : 0;
+          return `
+            <div class="expense-store-row">
+              <div class="expense-line">
+                <span>${escapeHtml(store)}</span>
+                <span>${money(total)} • ${percent.toFixed(1)}%</span>
+              </div>
+              <div class="expense-bar">
+                <div class="expense-fill" style="width:${Math.max(0,Math.min(100,percent))}%"></div>
+              </div>
+            </div>
+          `;
+        })
+        .join("");
+
+      expenseContent.innerHTML = `
+        <div class="receipt-box">
+          <div class="receipt-row">
+            <div><b>This month</b></div>
+            <div>${money(monthly)}</div>
+          </div>
+          <div class="receipt-row">
+            <div><b>This year</b></div>
+            <div>${money(annual)}</div>
+          </div>
+          <div class="receipt-row">
+            <div><b>Annual estimate</b></div>
+            <div>${money(monthly * 12)}</div>
+          </div>
+        </div>
+
+        <div style="font-weight:900;margin-bottom:8px;">Monthly spending by store</div>
+        ${storeRows || `<div class="empty">No receipts saved this month yet.</div>`}
+      `;
+
+      expenseModal.classList.remove("hidden");
+    }
+
+    function renderHistory(){
+      historyList.innerHTML = "";
+
+      const filtered = receipts.filter(r => (r.store || "Costco") === selectedStore);
+
+      if(!filtered.length){
+        historyList.innerHTML = `<div class="empty">No shopping history for ${escapeHtml(selectedStore)} yet.</div>`;
+        return;
+      }
+
+      filtered.forEach(receipt => {
+        const div = document.createElement("div");
+        div.className = "history-item";
+
+        const date = getReceiptDate(receipt);
+
+        const dateText = date && !isNaN(date)
+          ? date.toLocaleString([], { month:"short", day:"numeric", year:"numeric", hour:"numeric", minute:"2-digit" })
+          : "Saved receipt";
+
+        const itemLines = (receipt.items || [])
+          .map(i => {
+            const size = i.size ? ` • ${escapeHtml(i.size)}` : "";
+            const sale = i.sale ? ` • SALE` : "";
+            return `${escapeHtml(i.name)}${size} × ${i.quantity || 1} — ${i.price ? escapeHtml(i.price) : "no price"}${i.total ? ` (${money(i.total)})` : ""}${sale}`;
+          })
+          .join("<br>");
+
+        const actualLine = receipt.actualTotal != null ? `<div>Actual checkout total: <b>${money(receipt.actualTotal)}</b></div>` : "";
+        const estimatedLine = receipt.estimatedTotal != null ? `<div>Estimated total: <b>${money(receipt.estimatedTotal)}</b></div>` : "";
+        const fileLine = "";
+        const noteLine = receipt.note ? `<div class="note-box">${escapeHtml(receipt.note)}</div>` : "";
+
+        div.innerHTML = `
+          <div class="history-top">
+            <div>${escapeHtml(receipt.store || selectedStore)}</div>
+            <div>${money(receipt.total || receipt.actualTotal || receipt.estimatedTotal || 0)}</div>
+          </div>
+
+          <div class="history-meta">
+            ${dateText} • ${receipt.itemCount || totalQuantity(receipt.items || [])} item(s)
+          </div>
+
+          <div class="history-details">
+            ${estimatedLine}
+            ${actualLine}
+            <div style="margin-top:8px;">${itemLines || "No item details."}</div>
+            ${fileLine}
+            ${noteLine}
+          </div>
+
+          <div style="margin-top:10px;">
+            <button class="btn btn-danger btn-small" data-action="deleteReceipt">Delete Receipt</button>
+          </div>
+        `;
+
+        div.querySelector("[data-action='deleteReceipt']").addEventListener("click", async () => {
+          const ok = confirm(`Delete this ${receipt.store || selectedStore} receipt for ${money(receipt.total || receipt.actualTotal || receipt.estimatedTotal || 0)}?`);
+          if(!ok) return;
+
+          try{
+            await deleteDoc(doc(db,"receipts",receipt.id));
+          }catch(err){
+            alert(err.message);
+            console.error(err);
+          }
+        });
+
+        historyList.appendChild(div);
+      });
+    }
+
+    function watchItems(){
+      if(unsubscribeItems) unsubscribeItems();
+
+      const q = query(collection(db,"groceryItems"), orderBy("createdAt","desc"));
+
+      unsubscribeItems = onSnapshot(q, snap => {
+        currentItems = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+        renderAll();
+      }, err => {
+        console.error(err);
+        alert("Could not load grocery items. Check Firestore rules.");
+      });
+    }
+
+    function watchReceipts(){
+      if(unsubscribeReceipts) unsubscribeReceipts();
+
+      const q = query(collection(db,"receipts"), orderBy("createdAt","desc"));
+
+      unsubscribeReceipts = onSnapshot(q, snap => {
+        receipts = snap.docs.map(d => ({ id:d.id, ...d.data() }));
+        renderAll();
+      }, err => {
+        console.error(err);
+        alert("Could not load shopping history. Check Firestore rules for receipts.");
+      });
+    }
+
+    function getSuggestionPool(){
+      const map = new Map();
+
+      currentItems.forEach(item => {
+        if(!item.name) return;
+        const key = `${item.name.toLowerCase()}__${item.size || ""}__${item.store || "Costco"}`;
+        map.set(key,{
+          name:item.name,
+          quantity:item.quantity || 1,
+          size:item.size || "",
+          price:item.price || "",
+          note:item.note || "",
+          photoUrl:item.photoUrl || "",
+          sale:!!item.sale,
+          store:item.store || selectedStore,
+          source:item.status === "saved" ? "Saved" : item.status === "future" ? "Future" : "Current"
+        });
+      });
+
+      receipts.forEach(receipt => {
+        (receipt.items || []).forEach(item => {
+          if(!item.name) return;
+
+          const store = receipt.store || selectedStore;
+          const key = `${item.name.toLowerCase()}__${item.size || ""}__${store}`;
+
+          if(!map.has(key)){
+            map.set(key,{
+              name:item.name,
+              quantity:item.quantity || 1,
+              size:item.size || "",
+              price:item.price || "",
+              note:item.note || "",
+              photoUrl:"",
+              sale:!!item.sale,
+              store,
+              source:"History"
+            });
+          }
+        });
+      });
+
+      return Array.from(map.values());
+    }
+
+    function renderSuggestions(){
+      if(editingItemId){
+        suggestionsBox.classList.add("hidden");
+        suggestionsBox.innerHTML = "";
+        return;
+      }
+
+      const text = itemNameInput.value.trim().toLowerCase();
+
+      if(!text || text.length < 2){
+        suggestionsBox.classList.add("hidden");
+        suggestionsBox.innerHTML = "";
+        return;
+      }
+
+      const matches = getSuggestionPool()
+        .filter(item => item.name.toLowerCase().includes(text))
+        .slice(0,8);
+
+      if(!matches.length){
+        suggestionsBox.classList.add("hidden");
+        suggestionsBox.innerHTML = "";
+        return;
+      }
+
+      suggestionsBox.innerHTML = "";
+
+      matches.forEach(item => {
+        const div = document.createElement("div");
+        div.className = "suggestion";
+        div.innerHTML = `
+          <strong>${escapeHtml(item.name)} ${item.size ? `(${escapeHtml(item.size)})` : ""}</strong>
+          <span>
+            ${escapeHtml(item.store)}
+            • ${item.price ? escapeHtml(item.price) : "no price"}
+            ${item.sale ? " • SALE" : ""}
+            • from ${escapeHtml(item.source)}
+          </span>
+        `;
+
+        div.addEventListener("click", () => {
+          itemNameInput.value = item.name;
+          itemQtyInput.value = item.quantity || 1;
+          itemSizeInput.value = item.size || "";
+          itemPriceInput.value = item.price || "";
+          itemNoteInput.value = item.note || "";
+          itemPhotoInput.value = item.photoUrl || "";
+          itemStoreInput.value = item.store || selectedStore;
+          modalSale = !!item.sale;
+          setSaleButton();
+          suggestionsBox.classList.add("hidden");
+        });
+
+        suggestionsBox.appendChild(div);
+      });
+
+      suggestionsBox.classList.remove("hidden");
+    }
+
+    signInBtn.addEventListener("click",handleSignIn);
+    createAccountBtn.addEventListener("click",handleCreateAccount);
+    signOutBtn.addEventListener("click",handleSignOut);
+
+    bottomAddBtn.addEventListener("click",() => openAddModal());
+    saveModalItemBtn.addEventListener("click",handleAddItem);
+    closeModalBtn.addEventListener("click",closeAddModal);
+
+    expenseBtn.addEventListener("click",openExpenseModal);
+    closeExpenseBtn.addEventListener("click",() => expenseModal.classList.add("hidden"));
+
+    finishShoppingBtn.addEventListener("click",openFinishModal);
+    closeFinishBtn.addEventListener("click",() => finishModal.classList.add("hidden"));
+    saveReceiptBtn.addEventListener("click",saveReceipt);
+    themeToggleBtn.addEventListener("click",toggleTheme);
+
+    moveNeedBtn.addEventListener("click",() => updateEditingItemStatus("need"));
+    moveFutureBtn.addEventListener("click",() => updateEditingItemStatus("future"));
+    moveSavedBtn.addEventListener("click",() => updateEditingItemStatus("saved"));
+    deleteItemBtn.addEventListener("click",deleteEditingItem);
+
+    toggleSavedBtn.addEventListener("click",() => savedWrap.classList.toggle("hidden"));
+    toggleFutureBtn.addEventListener("click",() => futureWrap.classList.toggle("hidden"));
+    toggleHistoryBtn.addEventListener("click",() => historyWrap.classList.toggle("hidden"));
+
+    itemNameInput.addEventListener("input",renderSuggestions);
+
+    saleToggleBtn.addEventListener("click",() => {
+      modalSale = !modalSale;
+      setSaleButton();
+    });
+
+    addModal.addEventListener("click", e => {
+      if(e.target === addModal) closeAddModal();
+    });
+
+    expenseModal.addEventListener("click", e => {
+      if(e.target === expenseModal) expenseModal.classList.add("hidden");
+    });
+
+    finishModal.addEventListener("click", e => {
+      if(e.target === finishModal) finishModal.classList.add("hidden");
+    });
+
+    [emailInput,passwordInput].forEach(el => {
+      el.addEventListener("keydown", e => {
+        if(e.key === "Enter") handleSignIn();
+      });
+    });
+
+    [itemNameInput,itemQtyInput,itemSizeInput,itemPriceInput,itemPhotoInput].forEach(el => {
+      el.addEventListener("keydown", e => {
+        if(e.key === "Enter"){
+          handleAddItem();
+        }
+      });
+    });
+
+    applyInitialTheme();
+
+    onAuthStateChanged(auth, user => {
+      currentUser = user;
+
+      if(user){
+        authScreen.style.display = "none";
+        appShell.style.display = "block";
+        bottomBar.classList.remove("hidden");
+        accountText.textContent = `Account: ${user.email}`;
+        watchItems();
+        watchReceipts();
+      }else{
+        authScreen.style.display = "block";
+        appShell.style.display = "none";
+        bottomBar.classList.add("hidden");
+
+        currentItems = [];
+        receipts = [];
+        expandedItemId = null;
+        renderAll();
+
+        if(unsubscribeItems){
+          unsubscribeItems();
+          unsubscribeItems = null;
+        }
+
+        if(unsubscribeReceipts){
+          unsubscribeReceipts();
+          unsubscribeReceipts = null;
+        }
+      }
+    });
+  </script>
+</body>
+</html>
